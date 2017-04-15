@@ -1,54 +1,44 @@
 package cn.billionsfinance.businessaccount.core.bean;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Created by hanlin.huang on 2017/4/13.
  */
 public class BeanExcelExport implements Serializable {
 
-    //sheet
-    private String sheet;
+    //sheet名称或者文件名称
+    private String sheetOrFile;
 
     //行编号
-    private Long row;
-
-    //列编号
-    private Long column;
+    private int row;
 
     //单元格内容
-    private String value;
+    private Map<String,String> rowColumns;
 
 
-    public Long getRow() {
+    public int getRow() {
         return row;
     }
 
-    public void setRow(Long row) {
+    public void setRow(int row) {
         this.row = row;
     }
 
-    public Long getColumn() {
-        return column;
+    public Map<String, String> getRowColumns() {
+        return rowColumns;
     }
 
-    public void setColumn(Long column) {
-        this.column = column;
+    public void setRowColumns(Map<String, String> rowColumns) {
+        this.rowColumns = rowColumns;
     }
 
-    public String getValue() {
-        return value;
+    public String getSheetOrFile() {
+        return sheetOrFile;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public String getSheet() {
-        return sheet;
-    }
-
-    public void setSheet(String sheet) {
-        this.sheet = sheet;
+    public void setSheetOrFile(String sheetOrFile) {
+        this.sheetOrFile = sheetOrFile;
     }
 }
