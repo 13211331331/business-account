@@ -98,11 +98,11 @@ public class ExportUtil {
 
             ExportExcel2007 exportExcel2007 = new ExportExcel2007();
 
-            try {
-                exportExcel2007.writeExcelToFile("D:\\doc", "test111",count, "导出信托回款", list,rs);
+           /* try {
+                exportExcel2007.exportExcel("D:\\doc", "test111",count, "导出信托回款", list,rs);
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
 
 
         } catch (SQLException e) {

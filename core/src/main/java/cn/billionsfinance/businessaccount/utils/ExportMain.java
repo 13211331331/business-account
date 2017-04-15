@@ -2,8 +2,13 @@ package cn.billionsfinance.businessaccount.utils;
 
 
 import java.io.*;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -13,6 +18,7 @@ import java.util.Properties;
 public class ExportMain {
 
     public static void main(String[] args) {
+        Date start = new Date();
 
         boolean isNext = true;
 
@@ -50,9 +56,9 @@ public class ExportMain {
                 CP2.show(2, "总记录数：" + count);
 
                 JdbcUtil.close(rs);
-
                 rs = stmt.executeQuery(sql);
                 rsmd = rs.getMetaData();
+
 
                 List<String> list = new ArrayList<String>();
                 for (int i = 1; i <= rsmd.getColumnCount(); i++) {
@@ -81,11 +87,16 @@ public class ExportMain {
                 }
 
                 try {
-                    exportExcel2007.writeExcelToFile(path, sqlFile.substring(0,sqlFile.indexOf(".")), count, sqlFile.substring(0,sqlFile.indexOf(".")), list, rs);
+                    exportExcel2007.exportExcel(path, sqlFile.substring(0, sqlFile.indexOf(".")), count, sqlFile.substring(0, sqlFile.indexOf(".")), list, rs);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
+
+                System.out.println("");
+                System.out.println("-------------------------");
+                System.out.println("总耗时："+ DateDistance.getDistanceTime(start,new Date()));
+                System.out.println("-------------------------");
 
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -203,18 +214,21 @@ public class ExportMain {
         JdbcUtil.setDriver(jdbc_driver);
         JdbcUtil.setUser(jdbc_username);
         JdbcUtil.setPassword(jdbc_password);
-        String DEFAULT_COLUMN_SIZE = pps.getProperty("DEFAULT_COLUMN_SIZE");
+        String DEFAULT_COLUMN_SIZE = pps.getProperty("DEFAULT_COLUMN_SIZE","15");
         ExportExcel2007.DEFAULT_COLUMN_SIZE = Integer.valueOf(DEFAULT_COLUMN_SIZE);
 
-        String SHEET_SIZE = pps.getProperty("SHEET_SIZE");
-        ExportExcel2007.SHEET_SIZE = Long.valueOf(SHEET_SIZE);
+        String SHEET_FILE_SIZE = pps.getProperty("SHEET_FILE_SIZE","1000");
+        ExportExcel2007.SHEET_FILE_SIZE = Long.valueOf(SHEET_FILE_SIZE);
 
-        String SCHEMA = pps.getProperty("SCHEMA");
+        String SCHEMA = pps.getProperty("SCHEMA","1");
         ExportExcel2007.SCHEMA = Integer.valueOf(SCHEMA);
 
-        String THREAD_NUMBER = pps.getProperty("THREAD_NUMBER");
+        String THREAD_NUMBER = pps.getProperty("THREAD_NUMBER","50");
         ExportExcel2007.THREAD_NUMBER = Integer.valueOf(THREAD_NUMBER);
 
+
+        String QUEUE_LIST_SIZE = pps.getProperty("QUEUE_LIST_SIZE","5000");
+        ExportExcel2007.QUEUE_LIST_SIZE = Integer.valueOf(QUEUE_LIST_SIZE);
 
 
         return result;
