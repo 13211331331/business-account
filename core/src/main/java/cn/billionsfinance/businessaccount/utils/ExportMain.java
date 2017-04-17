@@ -87,7 +87,7 @@ public class ExportMain {
                 }
 
                 try {
-                    exportExcel2007.exportExcel(path, sqlFile.substring(0, sqlFile.indexOf(".")), count, sqlFile.substring(0, sqlFile.indexOf(".")), list, rs);
+                    exportExcel2007.exportExcel(path, sqlFile.substring(0, sqlFile.indexOf(".")), count, list, rs);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

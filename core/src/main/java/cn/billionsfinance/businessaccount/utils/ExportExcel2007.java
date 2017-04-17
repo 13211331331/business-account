@@ -60,7 +60,7 @@ public class ExportExcel2007 {
      *
      * @param columnNames 表头
      */
-    public void exportExcel(String directory, String fileName,Long count, String sheetName, List<String> columnNames,ResultSet rs) throws IOException {
+    public void exportExcel(String directory, String fileName,Long count, List<String> columnNames,ResultSet rs) throws IOException {
 
         this.countAll = count;
         this.countOver = count;
@@ -77,21 +77,21 @@ public class ExportExcel2007 {
             }
             for(Long i = 1l; i<=temp1;i++){
                 if(i == temp1){
-                    sheetsOrFiles.add(sheetName + ((i-1l)*SHEET_FILE_SIZE+1) + "-" + count);
+                    sheetsOrFiles.add(fileName + ((i-1l)*SHEET_FILE_SIZE+1) + "-" + count);
                 }
                 else{
-                    sheetsOrFiles.add(sheetName + ((i-1l)*SHEET_FILE_SIZE+1) + "-" + ((i)*SHEET_FILE_SIZE));
+                    sheetsOrFiles.add(fileName + ((i-1l)*SHEET_FILE_SIZE+1) + "-" + ((i)*SHEET_FILE_SIZE));
                 }
             }
         }
         else{
-            sheetsOrFiles.add(sheetName);
+            sheetsOrFiles.add(fileName);
             PAGE_NUMBER = 1l;
         }
         SHEETS_OR_FILES = sheetsOrFiles;
         ExportExcel2007.directory = directory;
         if(ExportExcel2007.SCHEMA == 1){
-            ExportExcel2007.excelFileName = Arrays.asList(sheetName);
+            ExportExcel2007.excelFileName = Arrays.asList(fileName);
         }
 
         this.tplWorkBook = new SXSSFWorkbook(flushRows);
@@ -130,6 +130,9 @@ public class ExportExcel2007 {
         AsynWorker.doAsynWork(new Object[]{(ArrayList<String>) columnNames }, this, "doingExport");
         AsynWorker.doAsynWork(new Object[]{}, this, "closeFile");
         putting(columnNames, rs);
+        ExcelProducer producer = new ExcelProducer(rs,columnNames);
+        Thread s = new Thread(producer);
+        s.start();
     }
 
 
