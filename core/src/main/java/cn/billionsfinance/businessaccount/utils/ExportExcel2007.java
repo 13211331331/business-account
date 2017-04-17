@@ -31,7 +31,10 @@ public class ExportExcel2007 {
     public static SXSSFWorkbook tplWorkBook;
 
     public static String directory;
-    public static String fileName;
+
+    public static String excelFileName;
+
+    public static List<String> SHEETS_OR_FILES;
 
 
     //默认列宽度
@@ -48,6 +51,8 @@ public class ExportExcel2007 {
 
     public static Long PAGE_NUMBER = 0l;
     public static Long PAGE_CURRENT = 0L;
+
+    public static boolean complete = false;
 
 
     /**
@@ -83,6 +88,11 @@ public class ExportExcel2007 {
             sheetsOrFiles.add(sheetName);
             PAGE_NUMBER = 1l;
         }
+        SHEETS_OR_FILES = sheetsOrFiles;
+        ExportExcel2007.directory = directory;
+        if(ExportExcel2007.SCHEMA == 1){
+            ExportExcel2007.excelFileName = sheetName;
+        }
 
         this.tplWorkBook = new SXSSFWorkbook(flushRows);
         Map<String, CellStyle> cellStyleMap = styleMap(tplWorkBook);
@@ -117,7 +127,7 @@ public class ExportExcel2007 {
             sheet.createFreezePane( 0, 2, 0, 2 );
         }
 
-        AsynWorker.doAsynWork(new Object[]{(ArrayList<String>) sheetsOrFiles, (ArrayList<String>) columnNames, directory, fileName}, this, "doingExport");
+        AsynWorker.doAsynWork(new Object[]{(ArrayList<String>) sheetsOrFiles, (ArrayList<String>) columnNames }, this, "doingExport");
         AsynWorker.doAsynWork(new Object[]{}, this, "closeFile");
         putting(columnNames, rs, sheetsOrFiles);
     }
@@ -125,11 +135,11 @@ public class ExportExcel2007 {
 
     public void closeFile(){
         while (true){
-            if(ExportExcel2007.countOver<=0){
+            if(complete){
                 try {
                     OutputStream ops = null;
                     try {
-                        ops = new FileOutputStream(assertFile(directory, fileName));
+                        ops = new FileOutputStream(assertFile(directory, excelFileName));
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
@@ -197,15 +207,11 @@ public class ExportExcel2007 {
     }
 
 
-    public void doingExport(ArrayList<String> sheetsOrFiles,ArrayList<String> columnNames,String directory, String fileName) {
-        ExportExcel2007.directory = directory;
-        ExportExcel2007.fileName = fileName;
+    public void doingExport(ArrayList<String> sheetsOrFiles,ArrayList<String> columnNames) {
 
         ExecutorService service = Executors.newFixedThreadPool(THREAD_NUMBER);
         ConsoleProgressBar CP3 = new ConsoleProgressBar(0, countAll, 50, '#','=');
 
-        //ExcelConsumer consumer1 = new ExcelConsumer(CP3,directory,fileName,columnNames);
-        //service.submit(consumer1);
         for(int i=0;i<THREAD_NUMBER;i++){
             if(this.countOver == 0){
                 break;
@@ -406,6 +412,9 @@ public class ExportExcel2007 {
 
     public static synchronized void countOverNONO() {
         countOver = countOver - 1;
+        if(countOver <= 0){
+            complete = true;
+        }
     }
     public static synchronized void pageYESYES() {
         PAGE_CURRENT = PAGE_CURRENT + 1l;

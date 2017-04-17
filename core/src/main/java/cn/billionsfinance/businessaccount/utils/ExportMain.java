@@ -91,12 +91,19 @@ public class ExportMain {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                Date end = new Date();
+
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
 
                 System.out.println("");
-                System.out.println("-------------------------");
-                System.out.println("总耗时："+ DateDistance.getDistanceTime(start,new Date()));
-                System.out.println("-------------------------");
+                System.out.println("--------------------------------------------------");
+                System.out.println("总耗时："+ DateDistance.getDistanceTime(start,end));
+                System.out.println("--------------------------------------------------");
 
             } catch (SQLException e) {
                 e.printStackTrace();
