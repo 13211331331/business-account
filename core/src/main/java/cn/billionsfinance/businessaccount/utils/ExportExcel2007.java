@@ -210,7 +210,7 @@ public class ExportExcel2007 {
             if(this.countOver == 0){
                 break;
             }
-            ExcelConsumer consumer1 = new ExcelConsumer(CP3,directory,fileName,columnNames);
+            ExcelConsumer consumer1 = new ExcelConsumer(CP3,columnNames);
             service.submit(consumer1);
             //if(true)break;
             try {

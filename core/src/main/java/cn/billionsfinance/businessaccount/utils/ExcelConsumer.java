@@ -21,7 +21,7 @@ public class ExcelConsumer implements Runnable {
 
     private List<String> columnNames;
 
-    public ExcelConsumer(ConsoleProgressBar consoleProgressBar,String directory, String fileName,List<String> columnNames) {
+    public ExcelConsumer(ConsoleProgressBar consoleProgressBar,List<String> columnNames) {
         this.consoleProgressBar = consoleProgressBar;
         this.columnNames = columnNames;
     }
