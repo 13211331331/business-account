@@ -404,17 +404,10 @@ public class ExportExcel2007 {
         return styleMap;
     }
 
-
-
-
-
     public static synchronized void countOverNONO() {
         countOver = countOver - 1;
     }
-
     public static synchronized void pageYESYES() {
         PAGE_CURRENT = PAGE_CURRENT + 1l;
     }
-
-
 }
