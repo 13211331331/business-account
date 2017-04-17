@@ -32,7 +32,7 @@ public class ExportExcel2007 {
 
     public static String directory;
 
-    public static String excelFileName;
+    public static List<String> excelFileName;
 
     public static List<String> SHEETS_OR_FILES;
 
@@ -91,7 +91,7 @@ public class ExportExcel2007 {
         SHEETS_OR_FILES = sheetsOrFiles;
         ExportExcel2007.directory = directory;
         if(ExportExcel2007.SCHEMA == 1){
-            ExportExcel2007.excelFileName = sheetName;
+            ExportExcel2007.excelFileName = Arrays.asList(sheetName);
         }
 
         this.tplWorkBook = new SXSSFWorkbook(flushRows);
@@ -139,7 +139,10 @@ public class ExportExcel2007 {
                 try {
                     OutputStream ops = null;
                     try {
-                        ops = new FileOutputStream(assertFile(directory, excelFileName));
+                        if(ExportExcel2007.SCHEMA == 1){
+                            ops = new FileOutputStream(assertFile(directory, excelFileName.get(0)));
+                        }
+
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
@@ -412,7 +415,7 @@ public class ExportExcel2007 {
 
     public static synchronized void countOverNONO() {
         countOver = countOver - 1;
-        if(countOver <= 0){
+        if(countOver == 0){
             complete = true;
         }
     }
