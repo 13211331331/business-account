@@ -194,6 +194,7 @@ public class ExportExcel2007 {
                     list = new ArrayList<BeanExcelExport>();
                 }
             }
+            pageYESYES();
             ArrayList<BeanExcelExport> listAdd = (ArrayList<BeanExcelExport>) list.clone();
             try {
                 ExeclBasket.produce(listAdd);
