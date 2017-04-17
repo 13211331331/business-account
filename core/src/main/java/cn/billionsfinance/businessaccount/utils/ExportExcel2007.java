@@ -34,7 +34,6 @@ public class ExportExcel2007 {
     public static String fileName;
 
 
-
     //默认列宽度
     public static int DEFAULT_COLUMN_SIZE = 15;
 
@@ -61,7 +60,6 @@ public class ExportExcel2007 {
         this.countAll = count;
         this.countOver = count;
 
-
         List<String> sheetsOrFiles = new ArrayList<String>();
 
         if(count > SHEET_FILE_SIZE){
@@ -85,10 +83,6 @@ public class ExportExcel2007 {
             sheetsOrFiles.add(sheetName);
             PAGE_NUMBER = 1l;
         }
-
-
-
-
 
         this.tplWorkBook = new SXSSFWorkbook(flushRows);
         Map<String, CellStyle> cellStyleMap = styleMap(tplWorkBook);
@@ -123,30 +117,9 @@ public class ExportExcel2007 {
             sheet.createFreezePane( 0, 2, 0, 2 );
         }
 
-
-
-
-
-
-
-
-       /* Producer producer = new Producer("生产者001");
-        Producer producer2 = new Producer("生产者002");
-        Consumer consumer = new Consumer("消费者001");
-        service.submit(producer);
-        service.submit(producer2);
-        service.submit(consumer);*/
-
-
-
-
-
         AsynWorker.doAsynWork(new Object[]{(ArrayList<String>) sheetsOrFiles, (ArrayList<String>) columnNames, directory, fileName}, this, "doingExport");
         AsynWorker.doAsynWork(new Object[]{}, this, "closeFile");
         putting(columnNames, rs, sheetsOrFiles);
-
-
-
     }
 
 
@@ -233,21 +206,19 @@ public class ExportExcel2007 {
 
         //ExcelConsumer consumer1 = new ExcelConsumer(CP3,directory,fileName,columnNames);
         //service.submit(consumer1);
-
         for(int i=0;i<THREAD_NUMBER;i++){
             if(this.countOver == 0){
                 break;
             }
             ExcelConsumer consumer1 = new ExcelConsumer(CP3,directory,fileName,columnNames);
             service.submit(consumer1);
-            if(true)break;
+            //if(true)break;
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-
 
     }
 
