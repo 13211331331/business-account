@@ -34,22 +34,16 @@ public class ExcelConsumer implements Runnable {
                 int i = 0;
                 if(list != null){
                     for(BeanExcelExport bean:list){
-
                         Sheet sheet = ExportExcel2007.tplWorkBook.getSheet(bean.getSheetOrFile());
                         Row row = sheet.createRow(bean.getRow());
-
                         for(int j=0;j<columnNames.size();j++){
                             Cell contentCell = row.createCell(j);
                             contentCell.setCellValue(bean.getRowColumns().get(columnNames.get(j)));
                         }
-
                         i++;
                         ExportExcel2007.countOverNONO();
                         consoleProgressBar.show(ExportExcel2007.countAll  - ExportExcel2007.countOver,"正在导出第"+(ExportExcel2007.countAll  - ExportExcel2007.countOver)+"条数据...");
-
-
                         //写入成功一行数据递增行数
-
                         //每当行数达到设置的值就刷新数据到硬盘,以清理内存
                         if(i%ExportExcel2007.flushRows==0){
                             try {
@@ -58,11 +52,8 @@ public class ExcelConsumer implements Runnable {
                                 e.printStackTrace();
                             }
                         }
-
                     }
-
                 }
-
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
