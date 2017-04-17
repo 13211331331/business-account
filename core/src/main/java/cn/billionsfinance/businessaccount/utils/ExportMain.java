@@ -94,7 +94,7 @@ public class ExportMain {
                 Date end = new Date();
 
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
