@@ -127,9 +127,9 @@ public class ExportExcel2007 {
             sheet.createFreezePane( 0, 2, 0, 2 );
         }
 
-        AsynWorker.doAsynWork(new Object[]{(ArrayList<String>) sheetsOrFiles, (ArrayList<String>) columnNames }, this, "doingExport");
+        AsynWorker.doAsynWork(new Object[]{(ArrayList<String>) columnNames }, this, "doingExport");
         AsynWorker.doAsynWork(new Object[]{}, this, "closeFile");
-        putting(columnNames, rs, sheetsOrFiles);
+        putting(columnNames, rs);
     }
 
 
@@ -169,7 +169,7 @@ public class ExportExcel2007 {
 
 
     }
-    public void putting(List<String> columnNames, ResultSet rs, List<String> sheetsOrFiles) {
+    public void putting(List<String> columnNames, ResultSet rs) {
 
         ArrayList<BeanExcelExport> list;
         int index = 0;
@@ -177,7 +177,7 @@ public class ExportExcel2007 {
             list = new ArrayList<BeanExcelExport>();
             while (rs.next()) {
                 BeanExcelExport bean = new BeanExcelExport();
-                bean.setSheetOrFile(getSheetOrFileName(sheetsOrFiles));
+                bean.setSheetOrFile(getSheetOrFileName(SHEETS_OR_FILES));
                 bean.setRow(index +2);
                 bean.setRowColumns(getMap(rs,columnNames));
                 list.add(bean);
@@ -210,7 +210,7 @@ public class ExportExcel2007 {
     }
 
 
-    public void doingExport(ArrayList<String> sheetsOrFiles,ArrayList<String> columnNames) {
+    public void doingExport(ArrayList<String> columnNames) {
 
         ExecutorService service = Executors.newFixedThreadPool(THREAD_NUMBER);
         ConsoleProgressBar CP3 = new ConsoleProgressBar(0, countAll, 50, '#','=');
