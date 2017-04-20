@@ -154,7 +154,9 @@ public class ExportMain {
         BufferedReader reader = null;
         String sql = "";
         try {
-            reader = new BufferedReader(new FileReader(file));
+            reader = new BufferedReader(
+                    new InputStreamReader(new FileInputStream(file),"utf-8"));
+            //reader = new BufferedReader(new FileReader(file));
             String tempString = null;
 
             // 一次读入一行，直到读入null为文件结束
@@ -174,6 +176,33 @@ public class ExportMain {
             }
         }
 
+        System.out.println(sql);
+        System.out.println(StringUtil.isMessyCode(sql));
+        if(StringUtil.isMessyCode(sql)){
+            sql = "";
+            try {
+                reader = new BufferedReader(
+                        new InputStreamReader(new FileInputStream(file),"GBK"));
+                String tempString = null;
+
+                // 一次读入一行，直到读入null为文件结束
+                while ((tempString = reader.readLine()) != null) {
+                    // 显示行号
+                    sql += tempString.replace(";","");
+                }
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e1) {
+                    }
+                }
+            }
+        }
+        StringUtil.isMessyCode(sql);
         return sql;
     }
 

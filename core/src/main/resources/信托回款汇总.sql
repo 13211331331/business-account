@@ -1,2 +1,2 @@
-select t.serialno ╨ом╛╨е, t.objectno , t.paydate ╨ом╛й╠╪Д, t.payprincipalamt ╩╧©Н╫П╤Н
+select t.serialno Е░┬Е░▄Е▐╥, t.objectno , t.paydate Е░┬Е░▄Ф≈╤И≈╢, t.payprincipalamt Х©≤Ф╛╬И┤▒И╒²
   from ACCT_PAYMENT_SCHEDULE t where  rownum<60000
