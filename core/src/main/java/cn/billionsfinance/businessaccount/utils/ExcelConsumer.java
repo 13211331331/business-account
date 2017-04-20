@@ -34,7 +34,14 @@ public class ExcelConsumer implements Runnable {
                 int i = 0;
                 if(list != null){
                     for(BeanExcelExport bean:list){
-                        Sheet sheet = ExportExcel2007.tplWorkBook.getSheet(bean.getSheetOrFile());
+                        Sheet sheet = null;
+                        if(ExportExcel2007.SCHEMA == 1){
+                            sheet = ExportExcel2007.tplWorkBook.get(0).getSheet(bean.getSheetOrFile());
+                        }
+                        if(ExportExcel2007.SCHEMA == 2){
+                            int fileIndex = ExportExcel2007.getFileIndex(bean.getSheetOrFile());
+                            sheet = ExportExcel2007.tplWorkBook.get(fileIndex).getSheet(bean.getSheetOrFile());
+                        }
                         Row row = sheet.createRow(bean.getRow());
                         for(int j=0;j<columnNames.size();j++){
                             Cell contentCell = row.createCell(j);

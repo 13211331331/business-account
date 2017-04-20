@@ -28,7 +28,7 @@ public class ExportExcel2007 {
     //剩余未处理
     public static Long countOver = 0l;
 
-    public static SXSSFWorkbook tplWorkBook;
+    public static List<SXSSFWorkbook> tplWorkBook;
 
     public static String directory;
 
@@ -93,39 +93,79 @@ public class ExportExcel2007 {
         if(ExportExcel2007.SCHEMA == 1){
             ExportExcel2007.excelFileName = Arrays.asList(fileName);
         }
-
-        this.tplWorkBook = new SXSSFWorkbook(flushRows);
-        Map<String, CellStyle> cellStyleMap = styleMap(tplWorkBook);
-        // 表头样式
-        CellStyle headStyle = cellStyleMap.get("head");
-        CellStyle headTitleStyle = cellStyleMap.get("headTitle");
-        // 生成一个表格
-
-        for(String str:sheetsOrFiles){
-
-            Sheet  sheet = tplWorkBook.createSheet(str);
-            // 设置表格默认列宽度
-            sheet.setDefaultColumnWidth(DEFAULT_COLUMN_SIZE);
-            // 合并单元格
-            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnNames.size() - 1));
-
-            // 产生表格标题行
-            Row rowMerged = sheet.createRow(0);
-            Cell mergedCell = rowMerged.createCell(0);
-            mergedCell.setCellStyle(headTitleStyle);
-            mergedCell.setCellValue(new XSSFRichTextString(str));
-            //写入成功一行数据递增行数
-
-            // 产生表格表头列标题行
-            Row row = sheet.createRow(1);
-            for (int i = 0; i < columnNames.size(); i++) {
-                Cell cell = row.createCell(i);
-                cell.setCellStyle(headStyle);
-                RichTextString text = new XSSFRichTextString(columnNames.get(i));
-                cell.setCellValue(text);
-            }
-            sheet.createFreezePane( 0, 2, 0, 2 );
+        if(ExportExcel2007.SCHEMA == 2){
+            ExportExcel2007.excelFileName = sheetsOrFiles;
         }
+        tplWorkBook = new ArrayList<SXSSFWorkbook>();
+
+        for(int i=0;i<PAGE_NUMBER;i++){
+            SXSSFWorkbook book = new SXSSFWorkbook(flushRows);
+            Map<String, CellStyle> cellStyleMap = styleMap(book);
+            // 表头样式
+            CellStyle headStyle = cellStyleMap.get("head");
+            CellStyle headTitleStyle = cellStyleMap.get("headTitle");
+            // 生成一个表格
+
+            if(ExportExcel2007.SCHEMA == 1){
+
+                for(String str:sheetsOrFiles){
+
+                    Sheet  sheet = book.createSheet(str);
+                    // 设置表格默认列宽度
+                    sheet.setDefaultColumnWidth(DEFAULT_COLUMN_SIZE);
+                    // 合并单元格
+                    sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnNames.size() - 1));
+
+                    // 产生表格标题行
+                    Row rowMerged = sheet.createRow(0);
+                    Cell mergedCell = rowMerged.createCell(0);
+                    mergedCell.setCellStyle(headTitleStyle);
+                    mergedCell.setCellValue(new XSSFRichTextString(str));
+                    //写入成功一行数据递增行数
+
+                    // 产生表格表头列标题行
+                    Row row = sheet.createRow(1);
+                    for (int j = 0; j < columnNames.size(); j++) {
+                        Cell cell = row.createCell(j);
+                        cell.setCellStyle(headStyle);
+                        RichTextString text = new XSSFRichTextString(columnNames.get(j));
+                        cell.setCellValue(text);
+                    }
+                    sheet.createFreezePane( 0, 2, 0, 2 );
+                }
+            }
+
+            if(ExportExcel2007.SCHEMA == 2){
+
+                    Sheet  sheet = book.createSheet(ExportExcel2007.SHEETS_OR_FILES.get(i));
+                    // 设置表格默认列宽度
+                    sheet.setDefaultColumnWidth(DEFAULT_COLUMN_SIZE);
+                    // 合并单元格
+                    sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnNames.size() - 1));
+
+                    // 产生表格标题行
+                    Row rowMerged = sheet.createRow(0);
+                    Cell mergedCell = rowMerged.createCell(0);
+                    mergedCell.setCellStyle(headTitleStyle);
+                    mergedCell.setCellValue(new XSSFRichTextString(ExportExcel2007.SHEETS_OR_FILES.get(i)));
+                    //写入成功一行数据递增行数
+
+                    // 产生表格表头列标题行
+                    Row row = sheet.createRow(1);
+                    for (int j = 0; j < columnNames.size(); j++) {
+                        Cell cell = row.createCell(j);
+                        cell.setCellStyle(headStyle);
+                        RichTextString text = new XSSFRichTextString(columnNames.get(j));
+                        cell.setCellValue(text);
+                    }
+                    sheet.createFreezePane( 0, 2, 0, 2 );
+            }
+            tplWorkBook.add(book);
+        }
+
+
+
+
 
         AsynWorker.doAsynWork(new Object[]{(ArrayList<String>) columnNames }, this, "doingExport");
         AsynWorker.doAsynWork(new Object[]{}, this, "closeFile");
@@ -140,18 +180,27 @@ public class ExportExcel2007 {
         while (true){
             if(complete){
                 try {
-                    OutputStream ops = null;
+                    List<OutputStream> ops = new ArrayList<OutputStream>();
                     try {
-                        if(ExportExcel2007.SCHEMA == 1){
-                            ops = new FileOutputStream(assertFile(directory, excelFileName.get(0)));
+
+                        for(String str:ExportExcel2007.excelFileName){
+                            OutputStream os = new FileOutputStream(assertFile(directory, str));
+                            ops.add(os);
                         }
 
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
-                    tplWorkBook.write(ops);
-                    ops.flush();
-                    ops.close();
+
+                    for(int i=0;i<ops.size();i++){
+                        OutputStream outputStream = ops.get(i);
+                        tplWorkBook.get(i).write(outputStream);
+                        outputStream.flush();
+                        outputStream.close();
+                    }
+
+
+
                     System.exit(0);
                 } catch (IOException e) {
                     try {
@@ -425,5 +474,15 @@ public class ExportExcel2007 {
     }
     public static synchronized void pageYESYES() {
         PAGE_CURRENT = PAGE_CURRENT + 1l;
+    }
+
+    public static int getFileIndex(String sheetOrFile) {
+        for(int i = 0;i< SHEETS_OR_FILES.size();i++){
+            String s = SHEETS_OR_FILES.get(i);
+            if(s.equals(sheetOrFile)){
+                return i;
+            }
+        }
+        return 0;
     }
 }
