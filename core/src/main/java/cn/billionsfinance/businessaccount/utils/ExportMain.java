@@ -91,19 +91,25 @@ public class ExportMain {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Date end = new Date();
 
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                while (true){
+                    if(ExportExcel2007.completeAll){
+                        Date end = new Date();
+
+                        System.out.println("");
+                        System.out.println("--------------------------------------------------");
+                        System.out.println("总耗时："+ DateDistance.getDistanceTime(start,end));
+                        System.out.println("--------------------------------------------------");
+                        break;
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
                 }
 
-
-                System.out.println("");
-                System.out.println("--------------------------------------------------");
-                System.out.println("总耗时："+ DateDistance.getDistanceTime(start,end));
-                System.out.println("--------------------------------------------------");
 
             } catch (SQLException e) {
                 e.printStackTrace();

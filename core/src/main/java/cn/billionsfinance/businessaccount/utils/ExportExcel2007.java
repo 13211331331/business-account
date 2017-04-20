@@ -54,6 +54,8 @@ public class ExportExcel2007 {
 
     public static boolean complete = false;
 
+    public static boolean completeAll = false;
+
 
     /**
      * 导出字符串数据
@@ -201,6 +203,12 @@ public class ExportExcel2007 {
 
 
 
+                    completeAll = true;
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     System.exit(0);
                 } catch (IOException e) {
                     try {

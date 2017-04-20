@@ -100,8 +100,8 @@ public class ConsoleProgressBar {
         }
     }
 
-    private void draw(long len, float rate) {
-        System.out.print("\n");
+    private synchronized void draw(long len, float rate) {
+        //System.out.print("\n");
         System.out.print(starChar);
         for (int i = 0; i < len; i++) {
             System.out.print(showChar);
