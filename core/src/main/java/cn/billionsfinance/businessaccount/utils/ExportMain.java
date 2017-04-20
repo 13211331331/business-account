@@ -176,8 +176,6 @@ public class ExportMain {
             }
         }
 
-        System.out.println(sql);
-        System.out.println(StringUtil.isMessyCode(sql));
         if(StringUtil.isMessyCode(sql)){
             sql = "";
             try {
