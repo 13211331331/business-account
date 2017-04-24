@@ -168,7 +168,7 @@ public class ExportExcel2007 {
         AsynWorker.doAsynWork(new Object[]{(ArrayList<String>) columnNames }, this, "doingExport");
         AsynWorker.doAsynWork(new Object[]{}, this, "closeFile");
         AsynWorker.doAsynWork(new Object[]{}, this, "showProcess");
-        ThreadViewer.showThreads();
+        AsynWorker.doAsynWork(new Object[]{}, new ThreadViewer(), "showThreads");
         putting(columnNames, rs);
     }
 
