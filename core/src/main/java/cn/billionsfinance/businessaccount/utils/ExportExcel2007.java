@@ -165,23 +165,15 @@ public class ExportExcel2007 {
             tplWorkBook.add(book);
         }
 
-
-
-
-
         AsynWorker.doAsynWork(new Object[]{(ArrayList<String>) columnNames }, this, "doingExport");
         AsynWorker.doAsynWork(new Object[]{}, this, "closeFile");
         AsynWorker.doAsynWork(new Object[]{}, this, "showProcess");
         ThreadViewer.showThreads();
         putting(columnNames, rs);
-
-
-
-
     }
+
     public void showProcess(){
         ConsoleProgressBar CP3 = new ConsoleProgressBar(0, countAll, 50, '#','=');
-
         //写入成功一行数据递增行数
         while (true){
             try {
