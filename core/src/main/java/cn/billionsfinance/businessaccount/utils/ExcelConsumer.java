@@ -16,13 +16,13 @@ import java.util.List;
 public class ExcelConsumer implements Runnable {
 
 
-    private ConsoleProgressBar consoleProgressBar;
+    //private ConsoleProgressBar consoleProgressBar;
 
 
     private List<String> columnNames;
 
-    public ExcelConsumer(ConsoleProgressBar consoleProgressBar,List<String> columnNames) {
-        this.consoleProgressBar = consoleProgressBar;
+    public ExcelConsumer(List<String> columnNames) {
+       // this.consoleProgressBar = consoleProgressBar;
         this.columnNames = columnNames;
     }
 
@@ -49,7 +49,7 @@ public class ExcelConsumer implements Runnable {
                         }
                         i++;
                         ExportExcel2007.countOverNONO();
-                        consoleProgressBar.show(ExportExcel2007.countAll  - ExportExcel2007.countOver,"正在导出第"+(ExportExcel2007.countAll  - ExportExcel2007.countOver)+"条数据...");
+                        //consoleProgressBar.show(ExportExcel2007.countAll  - ExportExcel2007.countOver,Thread.currentThread().getName()+" 正在导出第"+(ExportExcel2007.countAll  - ExportExcel2007.countOver)+"条数据...");
                         //写入成功一行数据递增行数
                         //每当行数达到设置的值就刷新数据到硬盘,以清理内存
                         if(i%ExportExcel2007.flushRows==0){

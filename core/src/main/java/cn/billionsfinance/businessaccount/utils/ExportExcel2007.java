@@ -171,12 +171,27 @@ public class ExportExcel2007 {
 
         AsynWorker.doAsynWork(new Object[]{(ArrayList<String>) columnNames }, this, "doingExport");
         AsynWorker.doAsynWork(new Object[]{}, this, "closeFile");
+        AsynWorker.doAsynWork(new Object[]{}, this, "showProcess");
+        ThreadViewer.showThreads();
         putting(columnNames, rs);
-        ExcelProducer producer = new ExcelProducer(rs,columnNames);
-        Thread s = new Thread(producer);
-        s.start();
-    }
 
+
+
+
+    }
+    public void showProcess(){
+        ConsoleProgressBar CP3 = new ConsoleProgressBar(0, countAll, 50, '#','=');
+
+        //写入成功一行数据递增行数
+        while (true){
+            try {
+                CP3.show(ExportExcel2007.countAll  - ExportExcel2007.countOver,"正在导出第"+(ExportExcel2007.countAll  - ExportExcel2007.countOver)+"条数据...");
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public void closeFile(){
         while (true){
@@ -273,15 +288,19 @@ public class ExportExcel2007 {
 
     public void doingExport(ArrayList<String> columnNames) {
 
-        ExecutorService service = Executors.newFixedThreadPool(THREAD_NUMBER);
-        ConsoleProgressBar CP3 = new ConsoleProgressBar(0, countAll, 50, '#','=');
+       // ExecutorService service = Executors.newFixedThreadPool(THREAD_NUMBER);
+
 
         for(int i=0;i<THREAD_NUMBER;i++){
             if(this.countOver == 0){
                 break;
             }
-            ExcelConsumer consumer1 = new ExcelConsumer(CP3,columnNames);
-            service.submit(consumer1);
+
+            ExcelConsumer consumer1 = new ExcelConsumer(columnNames);
+            Thread thread = new Thread(consumer1);
+            thread.setName("ExcelConsumer->"+i);
+            thread.start();
+           // service.submit(consumer1);
             //if(true)break;
             try {
                 Thread.sleep(1000);
