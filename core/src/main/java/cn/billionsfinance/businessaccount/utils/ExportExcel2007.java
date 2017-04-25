@@ -274,7 +274,6 @@ public class ExportExcel2007 {
                         e.printStackTrace();
                     }
                     index1 = 0;
-                    //pageYESYES();
                     list = new ArrayList<BeanExcelExport>();
                 }
             }
