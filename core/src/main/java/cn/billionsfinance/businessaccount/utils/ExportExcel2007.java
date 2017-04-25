@@ -174,10 +174,17 @@ public class ExportExcel2007 {
 
     public void showProcess(){
         ConsoleProgressBar CP3 = new ConsoleProgressBar(0, countAll, 50, '#','=');
+        boolean flag = false;
         //写入成功一行数据递增行数
         while (true){
             try {
-                CP3.show(ExportExcel2007.countAll  - ExportExcel2007.countOver,"正在导出第"+(ExportExcel2007.countAll  - ExportExcel2007.countOver)+"条数据...");
+                Long over = ExportExcel2007.countAll  - ExportExcel2007.countOver;
+                if(!flag){
+                    CP3.show(over,"正在导出第"+(over)+"条数据...");
+                }
+                if(over.longValue() == ExportExcel2007.countAll.longValue()){
+                    flag = true;
+                }
                 Thread.sleep(300);
             } catch (InterruptedException e) {
                 e.printStackTrace();
