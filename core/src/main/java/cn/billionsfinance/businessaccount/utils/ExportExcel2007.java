@@ -58,6 +58,8 @@ public class ExportExcel2007 {
 
     public static boolean completeAll = false;
 
+    public static Map<String,String> SQL_MAP = new HashMap<String,String>();
+
 
     /**
      * 导出字符串数据

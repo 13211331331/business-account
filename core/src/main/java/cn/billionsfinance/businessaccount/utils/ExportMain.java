@@ -7,10 +7,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by hanlin.huang on 2017/4/10.
@@ -31,7 +28,10 @@ public class ExportMain {
         }
 
         if(isNext){
-            String sql = getSql();
+
+            String[] sqls = getSqlAndRename();
+            String sql = sqls[1];
+
 
             String countSql = "SELECT COUNT(1) SUM FROM (" + sql + ")";
             ConsoleProgressBar CP1 = new ConsoleProgressBar(0, 2, 50, '#', '=');
@@ -69,6 +69,7 @@ public class ExportMain {
                 ExportExcel2007 exportExcel2007 = new ExportExcel2007();
 
 
+
                 String path = ExportMain.class.getProtectionDomain().getCodeSource().getLocation().getPath();
                 if (path.substring(0, 1).endsWith("/")) {
                     path = path.substring(1, path.length());
@@ -77,7 +78,7 @@ public class ExportMain {
                     path = path.substring(0, path.lastIndexOf("/"));
                 }
 
-                File files = new File(path);
+               /* File files = new File(path);
                 String[] fileNames = files.list();
                 String sqlFile = null;
                 for(String str:fileNames){
@@ -85,9 +86,13 @@ public class ExportMain {
                         sqlFile = str;
                     }
                 }
+                File file = new File(path + sqlFile);
+                File file1 = new File(path + sqlFile+".over");
+                file.renameTo(file1);*/
+
 
                 try {
-                    exportExcel2007.exportExcel(path, sqlFile.substring(0, sqlFile.indexOf(".")), count, list, rs);
+                    exportExcel2007.exportExcel(path, sqls[0].substring(0, sqls[0].indexOf(".")), count, list, rs);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -100,7 +105,7 @@ public class ExportMain {
 
                         System.out.println("");
                         System.out.println("--------------------------------------------------");
-                        System.out.println("总耗时："+ DateDistance.getDistanceTime(start,end));
+                        System.out.println("导出文件："+sqls[0]+" 总耗时："+ DateDistance.getDistanceTime(start,end));
                         System.out.println("--------------------------------------------------");
                         break;
                     }
@@ -125,13 +130,10 @@ public class ExportMain {
 
 
 
-
-
-
-
     }
 
-    private static String getSql() {
+    private static String[] getSqlAndRename() {
+        String[] arr = new String[2];
         String path = ExportMain.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         if (path.substring(0, 1).endsWith("/")) {
             path = path.substring(1, path.length());
@@ -144,10 +146,12 @@ public class ExportMain {
         String[] fileNames = files.list();
         String sqlFile = null;
         for(String str:fileNames){
-            if(str.lastIndexOf(".sql") != -1){
+            if(str.endsWith(".sql")){
                 sqlFile = str;
+                break;
             }
         }
+        arr[0]= sqlFile;
 
         if(sqlFile == null){
             try {
@@ -158,13 +162,15 @@ public class ExportMain {
         }
 
 
+
         File file = new File(path + sqlFile);
+        File file1 = new File(path + sqlFile+".over");
+
         BufferedReader reader = null;
         String sql = "";
         try {
             reader = new BufferedReader(
                     new InputStreamReader(new FileInputStream(file),"utf-8"));
-            //reader = new BufferedReader(new FileReader(file));
             String tempString = null;
 
             // 一次读入一行，直到读入null为文件结束
@@ -183,6 +189,7 @@ public class ExportMain {
                 }
             }
         }
+
 
         if(StringUtil.isMessyCode(sql)){
             sql = "";
@@ -208,9 +215,19 @@ public class ExportMain {
                 }
             }
         }
-        StringUtil.isMessyCode(sql);
-        return sql;
+
+        for (Map.Entry<String, String> entry : ExportExcel2007.SQL_MAP.entrySet()) {
+            sql = sql.replaceAll(entry.getKey(),entry.getValue());
+        }
+
+
+        file.renameTo(file1);
+        //System.out.println(sql);
+        arr[1]= sql;
+        return arr;
     }
+
+
 
     private static boolean initConfig() throws Exception {
 
@@ -241,13 +258,18 @@ public class ExportMain {
             }
         }
         String configFile = path + "config.properties";
+        String sqlConfigFile = path + "sql-config.properties";
 
 
 
         Properties pps = new Properties();
+        Properties sqlPps = new Properties();
 
         InputStream in = new BufferedInputStream(new FileInputStream(configFile));
+        InputStream sqlIn = new BufferedInputStream(new FileInputStream(sqlConfigFile));
         pps.load(in);
+        sqlPps.load(sqlIn);
+
         String jdbc_driver = pps.getProperty("jdbc.driver");
         String jdbc_url = pps.getProperty("jdbc.url");
         String jdbc_username = pps.getProperty("jdbc.username");
@@ -274,6 +296,25 @@ public class ExportMain {
 
         String SHOW_THREAD = pps.getProperty("SHOW_THREAD","1");
         ExportExcel2007.SHOW_THREAD = Integer.valueOf(SHOW_THREAD);
+
+
+        // 返回Properties中包含的key-value的Set视图
+        Set<Map.Entry<Object, Object>> set = sqlPps.entrySet();
+        // 返回在此Set中的元素上进行迭代的迭代器
+        Iterator<Map.Entry<Object, Object>> it = set.iterator();
+        String key = null, value = null;
+        // 循环取出key-value
+        while (it.hasNext()) {
+            Map.Entry<Object, Object> entry = it.next();
+            key = String.valueOf(entry.getKey());
+            value = String.valueOf(entry.getValue());
+            key = key == null ? key : key.trim();
+            value = value == null ? value : value.trim();
+            // 将key-value放入map中
+            //System.out.println(key);
+            //System.out.println(value);
+            ExportExcel2007.SQL_MAP.put(key,value);
+        }
 
 
         return result;
