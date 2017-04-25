@@ -168,7 +168,7 @@ public class ExportExcel2007 {
         AsynWorker.doAsynWork(new Object[]{(ArrayList<String>) columnNames }, this, "doingExport");
         AsynWorker.doAsynWork(new Object[]{}, this, "closeFile");
         AsynWorker.doAsynWork(new Object[]{}, this, "showProcess");
-        AsynWorker.doAsynWork(new Object[]{}, new ThreadViewer(), "showThreads");
+      //  AsynWorker.doAsynWork(new Object[]{}, new ThreadViewer(), "showThreads");
         putting(columnNames, rs);
     }
 
@@ -178,7 +178,7 @@ public class ExportExcel2007 {
         while (true){
             try {
                 CP3.show(ExportExcel2007.countAll  - ExportExcel2007.countOver,"正在导出第"+(ExportExcel2007.countAll  - ExportExcel2007.countOver)+"条数据...");
-                Thread.sleep(300);
+                 Thread.sleep(300);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -240,6 +240,7 @@ public class ExportExcel2007 {
 
         ArrayList<BeanExcelExport> list;
         int index = 0;
+        int k = 1;
         try {
             list = new ArrayList<BeanExcelExport>();
             while (rs.next()) {
@@ -249,19 +250,22 @@ public class ExportExcel2007 {
                 bean.setRowColumns(getMap(rs,columnNames));
                 list.add(bean);
                 index++;
-                if(index == SHEET_FILE_SIZE.intValue()){
+                //System.out.println("第" + index + "条数据放入List");
+                if(index == QUEUE_LIST_SIZE){
                     ArrayList<BeanExcelExport> listAdd = (ArrayList<BeanExcelExport>) list.clone();
                     try {
                         ExeclBasket.produce(listAdd);
+                        //System.out.println("第" + k + "次将List放入队列");
+                        k++;
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                     index = 0;
-                    pageYESYES();
+                    //pageYESYES();
                     list = new ArrayList<BeanExcelExport>();
                 }
             }
-            pageYESYES();
+            //pageYESYES();
             ArrayList<BeanExcelExport> listAdd = (ArrayList<BeanExcelExport>) list.clone();
             try {
                 ExeclBasket.produce(listAdd);
@@ -497,5 +501,9 @@ public class ExportExcel2007 {
             }
         }
         return 0;
+    }
+
+    public static int getFileIndex1() {
+        return PAGE_CURRENT.intValue();
     }
 }
