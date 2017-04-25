@@ -178,7 +178,7 @@ public class ExportExcel2007 {
         while (true){
             try {
                 CP3.show(ExportExcel2007.countAll  - ExportExcel2007.countOver,"正在导出第"+(ExportExcel2007.countAll  - ExportExcel2007.countOver)+"条数据...");
-                Thread.sleep(1000);
+                Thread.sleep(300);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -280,20 +280,14 @@ public class ExportExcel2007 {
 
     public void doingExport(ArrayList<String> columnNames) {
 
-       // ExecutorService service = Executors.newFixedThreadPool(THREAD_NUMBER);
-
-
         for(int i=0;i<THREAD_NUMBER;i++){
             if(this.countOver == 0){
                 break;
             }
-
             ExcelConsumer consumer1 = new ExcelConsumer(columnNames);
             Thread thread = new Thread(consumer1);
             thread.setName("ExcelConsumer->"+i);
             thread.start();
-           // service.submit(consumer1);
-            //if(true)break;
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
