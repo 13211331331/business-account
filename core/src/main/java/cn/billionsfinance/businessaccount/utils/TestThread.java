@@ -41,6 +41,10 @@ public class TestThread {
         };
         thread2.setName("test333");
         thread2.start();
-        ThreadViewer.showThreads();
+      //  ThreadViewer.showThreads();
+
+        AsynWorker.doAsynWork(new Object[]{}, new ThreadViewer(), "showThreads");
+        System.out.println(222);
+        System.out.println(3333);
     }
 }
