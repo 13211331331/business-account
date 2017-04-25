@@ -271,6 +271,8 @@ public class ExportMain {
 
         String QUEUE_LIST_SIZE = pps.getProperty("QUEUE_LIST_SIZE","5000");
         ExportExcel2007.QUEUE_LIST_SIZE = Integer.valueOf(QUEUE_LIST_SIZE);
+        String SHOW_THREAD = pps.getProperty("SHOW_THREAD","1");
+        ExportExcel2007.SHOW_THREAD = Integer.valueOf(SHOW_THREAD);
 
 
         return result;

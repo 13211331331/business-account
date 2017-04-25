@@ -46,6 +46,7 @@ public class ExportExcel2007 {
     public static final int flushRows = 100;
 
     public static int SCHEMA = 1;
+    public static int SHOW_THREAD = 1;
 
     public static int QUEUE_LIST_SIZE;
 
@@ -168,7 +169,9 @@ public class ExportExcel2007 {
         AsynWorker.doAsynWork(new Object[]{(ArrayList<String>) columnNames }, this, "doingExport");
         AsynWorker.doAsynWork(new Object[]{}, this, "closeFile");
         AsynWorker.doAsynWork(new Object[]{}, this, "showProcess");
-        AsynWorker.doAsynWork(new Object[]{}, new ThreadViewer(), "showThreads");
+        if(SHOW_THREAD == 1){
+            AsynWorker.doAsynWork(new Object[]{}, new ThreadViewer(), "showThreads");
+        }
         putting(columnNames, rs);
     }
 
