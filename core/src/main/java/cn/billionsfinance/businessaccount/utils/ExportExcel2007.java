@@ -37,6 +37,8 @@ public class ExportExcel2007 {
     public static List<String> SHEETS_OR_FILES;
 
 
+    public static int QUEUE_LIST_SIZE;
+
     //默认列宽度
     public static int DEFAULT_COLUMN_SIZE = 15;
 
@@ -249,6 +251,7 @@ public class ExportExcel2007 {
 
         ArrayList<BeanExcelExport> list;
         int index = 0;
+        int index1 = 0;
         try {
             list = new ArrayList<BeanExcelExport>();
             while (rs.next()) {
@@ -258,15 +261,20 @@ public class ExportExcel2007 {
                 bean.setRowColumns(getMap(rs,columnNames));
                 list.add(bean);
                 index++;
+                index1++;
                 if(index == SHEET_FILE_SIZE.intValue()){
+                    index = 0;
+                    pageYESYES();
+                }
+                if(index1 == QUEUE_LIST_SIZE){
                     ArrayList<BeanExcelExport> listAdd = (ArrayList<BeanExcelExport>) list.clone();
                     try {
                         ExeclBasket.produce(listAdd);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    index = 0;
-                    pageYESYES();
+                    index1 = 0;
+                    //pageYESYES();
                     list = new ArrayList<BeanExcelExport>();
                 }
             }
