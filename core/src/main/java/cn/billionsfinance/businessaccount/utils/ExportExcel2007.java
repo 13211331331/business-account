@@ -48,7 +48,6 @@ public class ExportExcel2007 {
     public static int SCHEMA = 1;
     public static int SHOW_THREAD = 1;
 
-    public static int QUEUE_LIST_SIZE;
 
     public static Long PAGE_NUMBER = 0l;
     public static Long PAGE_CURRENT = 0L;
