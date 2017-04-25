@@ -16,13 +16,11 @@ import java.util.List;
 public class ExcelConsumer implements Runnable {
 
 
-    //private ConsoleProgressBar consoleProgressBar;
 
 
     private List<String> columnNames;
 
     public ExcelConsumer(List<String> columnNames) {
-        // this.consoleProgressBar = consoleProgressBar;
         this.columnNames = columnNames;
     }
 
