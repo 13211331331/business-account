@@ -217,7 +217,7 @@ public class ExportMain {
         }
 
         for (Map.Entry<String, String> entry : ExportExcel2007.SQL_MAP.entrySet()) {
-            sql = sql.replaceAll(entry.getKey(),entry.getValue());
+            sql = sql.replaceAll("${"+entry.getKey()+"}",entry.getValue());
         }
 
 
