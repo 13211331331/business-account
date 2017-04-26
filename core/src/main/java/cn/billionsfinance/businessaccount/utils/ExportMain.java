@@ -53,7 +53,7 @@ public class ExportMain {
                 while (rs.next()) {
                     count = rs.getLong("SUM");
                 }
-                CP2.show(2, "总记录数：" + count);
+                CP2.show(2, "读取文件："+sqls[0]+"  总记录数：" + count);
 
                 JdbcUtil.close(rs);
                 rs = stmt.executeQuery(sql);
