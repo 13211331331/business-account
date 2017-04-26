@@ -77,20 +77,6 @@ public class ExportMain {
                 if (path.endsWith(".jar")) {
                     path = path.substring(0, path.lastIndexOf("/"));
                 }
-
-               /* File files = new File(path);
-                String[] fileNames = files.list();
-                String sqlFile = null;
-                for(String str:fileNames){
-                    if(str.lastIndexOf(".sql") != -1){
-                        sqlFile = str;
-                    }
-                }
-                File file = new File(path + sqlFile);
-                File file1 = new File(path + sqlFile+".over");
-                file.renameTo(file1);*/
-
-
                 try {
                     exportExcel2007.exportExcel(path, sqls[0].substring(0, sqls[0].indexOf(".")), count, list, rs);
                 } catch (IOException e) {
