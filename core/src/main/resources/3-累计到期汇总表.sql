@@ -1,0 +1,1 @@
+select * from  contract_putout_2016 where rownum< 20000
