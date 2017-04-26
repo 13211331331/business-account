@@ -216,13 +216,13 @@ public class ExportMain {
             }
         }
 
+        sql =  sql.replaceAll("\\$","");
+        sql =  sql.replaceAll("\\{","@");
+        sql =  sql.replaceAll("\\}", "@");
         for (Map.Entry<String, String> entry : ExportExcel2007.SQL_MAP.entrySet()) {
-            sql = sql.replaceAll("${"+entry.getKey()+"}",entry.getValue());
+            sql = sql.replaceAll("@"+entry.getKey()+"@",entry.getValue());
         }
-
-
         file.renameTo(file1);
-        //System.out.println(sql);
         arr[1]= sql;
         return arr;
     }
