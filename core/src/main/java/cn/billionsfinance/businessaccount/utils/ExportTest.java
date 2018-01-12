@@ -1,6 +1,8 @@
 package cn.billionsfinance.businessaccount.utils;
 
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.*;
 import java.sql.*;
 import java.util.*;
@@ -13,7 +15,7 @@ public class ExportTest {
 
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Date start = new Date();
 
         boolean isNext = true;
@@ -116,7 +118,7 @@ public class ExportTest {
 
     }
 
-    private static String[] getSqlAndRename() {
+    private static String[] getSqlAndRename() throws IOException {
         String[] arr = new String[2];
         String path = ExportTest.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         if (path.substring(0, 1).endsWith("/")) {
@@ -151,28 +153,9 @@ public class ExportTest {
         File file1 = new File(path + sqlFile+".over");
 
         BufferedReader reader = null;
-        String sql = "";
-        try {
-            reader = new BufferedReader(
-                    new InputStreamReader(new FileInputStream(file),"utf-8"));
-            String tempString = null;
+        String sql = FileUtils.readFileToString(file, "GBK");
 
-            // 一次读入一行，直到读入null为文件结束
-            while ((tempString = reader.readLine()) != null) {
-                // 显示行号
-                sql += tempString.replace(";","");
-            }
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e1) {
-                }
-            }
-        }
+
 
 
         if(StringUtil.isMessyCode(sql)){
