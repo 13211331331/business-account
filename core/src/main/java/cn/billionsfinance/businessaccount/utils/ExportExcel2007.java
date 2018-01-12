@@ -1,9 +1,6 @@
 package cn.billionsfinance.businessaccount.utils;
 
-import cn.billionsfinance.businessaccount.core.bean.BeanExcelExport;
 import com.sun.rowset.CachedRowSetImpl;
-import org.apache.poi.hssf.usermodel.HSSFDataFormat;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -22,9 +19,6 @@ import java.util.*;
 public class ExportExcel2007 {
 
     public static int PAGE_SIZE = 10000;
-
-    //public static int THREAD_NUMBER = 50;
-
     //总数
     public static Integer countAll = 0;
     //剩余未处理
@@ -38,23 +32,16 @@ public class ExportExcel2007 {
 
     public static List<String> SHEETS_OR_FILES;
 
-
-    //public static int QUEUE_LIST_SIZE;
-
-    //默认列宽度
-    //public static int DEFAULT_COLUMN_SIZE = 15;
-
-    //public static Long SHEET_FILE_SIZE = 1000l;
-
     //刷新写入硬盘数据阀值
     public static final int flushRows = 100;
 
+    //是否启用拆分模式
+    public static int EXCEL_SPLIT = 0;
     public static int SCHEMA = 1;
     public static int SHOW_THREAD = 1;
 
 
     public static Integer PAGE_NUMBER = 0;
-    //public static Long PAGE_CURRENT = 0L;
 
     public static boolean complete = false;
 
@@ -97,82 +84,106 @@ public class ExportExcel2007 {
             sheetsOrFiles.add(fileName);
             PAGE_NUMBER = 1;
         }
+        if(ExportExcel2007.EXCEL_SPLIT == 0){
+            sheetsOrFiles.clear();
+            sheetsOrFiles.add(fileName);
+        }
         SHEETS_OR_FILES = sheetsOrFiles;
         ExportExcel2007.directory = directory;
-        if(ExportExcel2007.SCHEMA == 1){
+
+        if(ExportExcel2007.EXCEL_SPLIT == 0){
             ExportExcel2007.excelFileName = Arrays.asList(fileName);
         }
-        if(ExportExcel2007.SCHEMA == 2){
-            ExportExcel2007.excelFileName = sheetsOrFiles;
+
+        if(ExportExcel2007.EXCEL_SPLIT == 1){
+            if(ExportExcel2007.SCHEMA == 1){
+                ExportExcel2007.excelFileName = Arrays.asList(fileName);
+            }
+            if(ExportExcel2007.SCHEMA == 2){
+                ExportExcel2007.excelFileName = sheetsOrFiles;
+            }
         }
+
         tplWorkBook = new ArrayList<SXSSFWorkbook>();
 
-        for(int i=0;i<PAGE_NUMBER;i++){
-            SXSSFWorkbook book = new SXSSFWorkbook(flushRows);
-            //Map<String, CellStyle> cellStyleMap = styleMap(book);
-            // 表头样式
-            //CellStyle headStyle = cellStyleMap.get("head");
-            //CellStyle headTitleStyle = cellStyleMap.get("headTitle");
-            // 生成一个表格
+        if(ExportExcel2007.EXCEL_SPLIT == 1){
+            for(int i=0;i<PAGE_NUMBER;i++){
+                SXSSFWorkbook book = new SXSSFWorkbook(flushRows);
+                if(ExportExcel2007.SCHEMA == 1){
 
-            if(ExportExcel2007.SCHEMA == 1){
+                    for(String str:sheetsOrFiles){
 
-                for(String str:sheetsOrFiles){
+                        Sheet  sheet = book.createSheet(str);
+                        // 合并单元格
+                        sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnNames.size() - 1));
 
-                    Sheet  sheet = book.createSheet(str);
-                    // 设置表格默认列宽度
-                    //sheet.setDefaultColumnWidth(DEFAULT_COLUMN_SIZE);
+                        // 产生表格标题行
+                        Row rowMerged = sheet.createRow(0);
+                        Cell mergedCell = rowMerged.createCell(0);
+                        mergedCell.setCellValue(new XSSFRichTextString(str));
+                        //写入成功一行数据递增行数
+
+                        // 产生表格表头列标题行
+                        Row row = sheet.createRow(1);
+                        for (int j = 0; j < columnNames.size(); j++) {
+                            Cell cell = row.createCell(j);
+                            RichTextString text = new XSSFRichTextString(columnNames.get(j));
+                            cell.setCellValue(text);
+                        }
+                        sheet.createFreezePane( 0, 2, 0, 2 );
+                    }
+                }
+
+                if(ExportExcel2007.SCHEMA == 2){
+
+                    Sheet  sheet = book.createSheet(ExportExcel2007.SHEETS_OR_FILES.get(i));
                     // 合并单元格
                     sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnNames.size() - 1));
 
                     // 产生表格标题行
                     Row rowMerged = sheet.createRow(0);
                     Cell mergedCell = rowMerged.createCell(0);
-                   // mergedCell.setCellStyle(headTitleStyle);
-                    mergedCell.setCellValue(new XSSFRichTextString(str));
+                    mergedCell.setCellValue(new XSSFRichTextString(ExportExcel2007.SHEETS_OR_FILES.get(i)));
                     //写入成功一行数据递增行数
 
                     // 产生表格表头列标题行
                     Row row = sheet.createRow(1);
                     for (int j = 0; j < columnNames.size(); j++) {
                         Cell cell = row.createCell(j);
-                       // cell.setCellStyle(headStyle);
+                        //cell.setCellStyle(headStyle);
                         RichTextString text = new XSSFRichTextString(columnNames.get(j));
                         cell.setCellValue(text);
                     }
                     sheet.createFreezePane( 0, 2, 0, 2 );
                 }
+                tplWorkBook.add(book);
             }
+        }
+        if(ExportExcel2007.EXCEL_SPLIT == 0){
+            SXSSFWorkbook book = new SXSSFWorkbook(flushRows);
+            Sheet  sheet = book.createSheet(ExportExcel2007.SHEETS_OR_FILES.get(0));
+            // 合并单元格
+            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnNames.size() - 1));
 
-            if(ExportExcel2007.SCHEMA == 2){
+            // 产生表格标题行
+            Row rowMerged = sheet.createRow(0);
+            Cell mergedCell = rowMerged.createCell(0);
+            mergedCell.setCellValue(new XSSFRichTextString(ExportExcel2007.SHEETS_OR_FILES.get(0)));
+            //写入成功一行数据递增行数
 
-                Sheet  sheet = book.createSheet(ExportExcel2007.SHEETS_OR_FILES.get(i));
-                // 设置表格默认列宽度
-                //sheet.setDefaultColumnWidth(DEFAULT_COLUMN_SIZE);
-                // 合并单元格
-                sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnNames.size() - 1));
-
-                // 产生表格标题行
-                Row rowMerged = sheet.createRow(0);
-                Cell mergedCell = rowMerged.createCell(0);
-                //mergedCell.setCellStyle(headTitleStyle);
-                mergedCell.setCellValue(new XSSFRichTextString(ExportExcel2007.SHEETS_OR_FILES.get(i)));
-                //写入成功一行数据递增行数
-
-                // 产生表格表头列标题行
-                Row row = sheet.createRow(1);
-                for (int j = 0; j < columnNames.size(); j++) {
-                    Cell cell = row.createCell(j);
-                    //cell.setCellStyle(headStyle);
-                    RichTextString text = new XSSFRichTextString(columnNames.get(j));
-                    cell.setCellValue(text);
-                }
-                sheet.createFreezePane( 0, 2, 0, 2 );
+            // 产生表格表头列标题行
+            Row row = sheet.createRow(1);
+            for (int j = 0; j < columnNames.size(); j++) {
+                Cell cell = row.createCell(j);
+                //cell.setCellStyle(headStyle);
+                RichTextString text = new XSSFRichTextString(columnNames.get(j));
+                cell.setCellValue(text);
             }
+            sheet.createFreezePane( 0, 2, 0, 2 );
             tplWorkBook.add(book);
         }
 
-        //AsynWorker.doAsynWork(new Object[]{(ArrayList<String>) columnNames }, this, "doingExport");
+
         AsynWorker.doAsynWork(new Object[]{}, this, "closeFile");
         AsynWorker.doAsynWork(new Object[]{}, this, "showProcess");
         if(SHOW_THREAD == 1){
@@ -224,8 +235,6 @@ public class ExportExcel2007 {
                         outputStream.close();
                     }
 
-
-
                     completeAll = true;
                     try {
                         Thread.sleep(2000);
@@ -247,14 +256,9 @@ public class ExportExcel2007 {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
         }
-
-
     }
     public void putting(List<String> columnNames,List<String> columnTypes, Integer count,ResultSet rs) throws SQLException {
-
-
 
         int tmp1 = count/PAGE_SIZE;
         int tmp2 = count%PAGE_SIZE;
@@ -269,47 +273,6 @@ public class ExportExcel2007 {
             puttingPage(i,crs,columnNames,columnTypes);
         }
 
-
-
-
-        /*ArrayList<BeanExcelExport> list;
-        int index66 = 0;
-        int index166 = 0;
-        try {
-            list = new ArrayList<BeanExcelExport>();
-            while (rs.next()) {
-                BeanExcelExport bean = new BeanExcelExport();
-                bean.setSheetOrFile(getSheetOrFileName(SHEETS_OR_FILES));
-                bean.setRow(index +2);
-                bean.setRowColumns(getMap(rs,columnNames));
-                list.add(bean);
-                index++;
-                index1++;
-                if(index == SHEET_FILE_SIZE.intValue()){
-                    index = 0;
-                    pageYESYES();
-                }
-                if(index1 == QUEUE_LIST_SIZE){
-                    ArrayList<BeanExcelExport> listAdd = (ArrayList<BeanExcelExport>) list.clone();
-                    try {
-                        ExeclBasket.produce(listAdd);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    index1 = 0;
-                    list = new ArrayList<BeanExcelExport>();
-                }
-            }
-            pageYESYES();
-            ArrayList<BeanExcelExport> listAdd = (ArrayList<BeanExcelExport>) list.clone();
-            try {
-                ExeclBasket.produce(listAdd);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }*/
     }
 
     public void puttingPage(Integer page,CachedRowSet crs, List<String> columnNames,List<String> columnTypes) throws SQLException {
@@ -319,14 +282,22 @@ public class ExportExcel2007 {
 
             Sheet sheet = null;
             Row row = null;
-            if(ExportExcel2007.SCHEMA == 1){
-                sheet = ExportExcel2007.tplWorkBook.get(0).getSheet(SHEETS_OR_FILES.get(page - 1));
+            if(ExportExcel2007.EXCEL_SPLIT == 0){
+                sheet = ExportExcel2007.tplWorkBook.get(0).getSheet(SHEETS_OR_FILES.get(0));
                 row = sheet.createRow(index + 2);
             }
-            if(ExportExcel2007.SCHEMA == 2){
-                sheet = ExportExcel2007.tplWorkBook.get(page-1).getSheet(SHEETS_OR_FILES.get(page-1));
-                row = sheet.createRow(index + 2);
+
+            if(ExportExcel2007.EXCEL_SPLIT == 1){
+                if(ExportExcel2007.SCHEMA == 1){
+                    sheet = ExportExcel2007.tplWorkBook.get(0).getSheet(SHEETS_OR_FILES.get(page - 1));
+                    row = sheet.createRow(index + 2);
+                }
+                if(ExportExcel2007.SCHEMA == 2){
+                    sheet = ExportExcel2007.tplWorkBook.get(page-1).getSheet(SHEETS_OR_FILES.get(page-1));
+                    row = sheet.createRow(index + 2);
+                }
             }
+
 
             index ++;
 
@@ -376,29 +347,8 @@ public class ExportExcel2007 {
         return false;
     }
 
-   /* private String getSheetOrFileName(List<String> sheetsOrFiles) {
-        return sheetsOrFiles.get(PAGE_CURRENT.intValue());
-    }*/
 
 
-   /* public void doingExport(ArrayList<String> columnNames) {
-
-        for(int i=0;i<THREAD_NUMBER;i++){
-            if(this.countOver == 0){
-                break;
-            }
-            ExcelConsumer consumer1 = new ExcelConsumer(columnNames);
-            Thread thread = new Thread(consumer1);
-            thread.setName("ExcelConsumer->"+i);
-            thread.start();
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }*/
 
 
     /**
@@ -430,165 +380,12 @@ public class ExportExcel2007 {
     }
 
 
-    private Map<String, String> getMap(ResultSet rs, List<String> columnNames) {
-        Map<String, String> map = new HashMap<String, String>();
-        for(String key:columnNames){
-            try {
-                map.put(key,rs.getString(key));
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return map;
-    }
-
-
-    /**
-     * 创建单元格表头样式
-     *
-     * @param workbook 工作薄
-     */
-    private CellStyle createCellHeadStyle(Workbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        // 设置边框样式
-        style.setBorderBottom(XSSFCellStyle.BORDER_THIN);
-        style.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-        style.setBorderRight(XSSFCellStyle.BORDER_THIN);
-        style.setBorderTop(XSSFCellStyle.BORDER_THIN);
-        //设置对齐样式
-        style.setAlignment(XSSFCellStyle.ALIGN_CENTER);
-        // 生成字体
-        Font font = workbook.createFont();
-        // 表头样式
-        style.setFillPattern(XSSFCellStyle.SOLID_FOREGROUND);
-        style.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
-        font.setFontHeightInPoints((short) 10);
-        font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
-        // 把字体应用到当前的样式
-        style.setFont(font);
-        return style;
-    }
-
-
-    /**
-     * 创建单元格表头样式
-     *
-     * @param workbook 工作薄
-     */
-    private CellStyle createCellHeadTitleStyle11(Workbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        // 设置边框样式
-        style.setBorderBottom(XSSFCellStyle.BORDER_THIN);
-        style.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-        style.setBorderRight(XSSFCellStyle.BORDER_THIN);
-        style.setBorderTop(XSSFCellStyle.BORDER_THIN);
-        //设置对齐样式
-        style.setAlignment(XSSFCellStyle.ALIGN_CENTER);
-        // 生成字体
-        Font font = workbook.createFont();
-        // 表头样式
-        style.setFillPattern(XSSFCellStyle.SOLID_FOREGROUND);
-        style.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
-        font.setFontHeightInPoints((short) 10);
-        font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
-        // 把字体应用到当前的样式
-        style.setFont(font);
-        return style;
-    }
-
-    /**
-     * 创建单元格正文样式
-     *
-     * @param workbook 工作薄
-     */
-    private CellStyle createCellContentStyle11(Workbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        // 设置边框样式
-        style.setBorderBottom(XSSFCellStyle.BORDER_THIN);
-        style.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-        style.setBorderRight(XSSFCellStyle.BORDER_THIN);
-        style.setBorderTop(XSSFCellStyle.BORDER_THIN);
-        //设置对齐样式
-        style.setAlignment(XSSFCellStyle.ALIGN_CENTER);
-        // 生成字体
-        Font font = workbook.createFont();
-        // 正文样式
-        style.setFillPattern(XSSFCellStyle.NO_FILL);
-        style.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
-        font.setBoldweight(XSSFFont.BOLDWEIGHT_NORMAL);
-        // 把字体应用到当前的样式
-        style.setFont(font);
-        return style;
-    }
-
-    /**
-     * 单元格样式(Integer)列表
-     */
-    private CellStyle createCellContent4IntegerStyle11(Workbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        // 设置边框样式
-        style.setBorderBottom(XSSFCellStyle.BORDER_THIN);
-        style.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-        style.setBorderRight(XSSFCellStyle.BORDER_THIN);
-        style.setBorderTop(XSSFCellStyle.BORDER_THIN);
-        //设置对齐样式
-        style.setAlignment(XSSFCellStyle.ALIGN_CENTER);
-        // 生成字体
-        Font font = workbook.createFont();
-        // 正文样式
-        style.setFillPattern(XSSFCellStyle.NO_FILL);
-        style.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
-        font.setBoldweight(XSSFFont.BOLDWEIGHT_NORMAL);
-        // 把字体应用到当前的样式
-        style.setFont(font);
-        style.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,##0"));//数据格式只显示整数
-        return style;
-    }
-
-    /**
-     * 单元格样式(Double)列表
-     */
-    private CellStyle createCellContent4DoubleStyle11(Workbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        // 设置边框样式
-        style.setBorderBottom(XSSFCellStyle.BORDER_THIN);
-        style.setBorderLeft(XSSFCellStyle.BORDER_THIN);
-        style.setBorderRight(XSSFCellStyle.BORDER_THIN);
-        style.setBorderTop(XSSFCellStyle.BORDER_THIN);
-        //设置对齐样式
-        style.setAlignment(XSSFCellStyle.ALIGN_CENTER);
-        // 生成字体
-        Font font = workbook.createFont();
-        // 正文样式
-        style.setFillPattern(XSSFCellStyle.NO_FILL);
-        style.setVerticalAlignment(XSSFCellStyle.VERTICAL_CENTER);
-        font.setBoldweight(XSSFFont.BOLDWEIGHT_NORMAL);
-        // 把字体应用到当前的样式
-        style.setFont(font);
-        style.setDataFormat(HSSFDataFormat.getBuiltinFormat("#,##0.00"));//保留两位小数点
-        return style;
-    }
-
-    /**
-     * 单元格样式列表
-     */
-    private Map<String, CellStyle> styleMap11(Workbook workbook) {
-        Map<String, CellStyle> styleMap = new LinkedHashMap<String, CellStyle>();
-        styleMap.put("head", createCellHeadStyle(workbook));
-       // styleMap.put("headTitle", createCellHeadTitleStyle(workbook));
-        //styleMap.put("content", createCellContentStyle(workbook));
-       // styleMap.put("integer", createCellContent4IntegerStyle(workbook));
-        //styleMap.put("double", createCellContent4DoubleStyle(workbook));
-        return styleMap;
-    }
-
     public static synchronized void countOverNONO() {
         countOver = countOver - 1;
         if(countOver == 0){
             complete = true;
         }
     }
-
 
 
 }

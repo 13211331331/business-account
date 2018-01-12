@@ -31,7 +31,6 @@ public class ExportTest {
             String[] sqls = getSqlAndRename();
             String sql = sqls[1];
 
-
             String countSql = "SELECT COUNT(1) SUM FROM (" + sql + ")";
             ConsoleProgressBar CP1 = new ConsoleProgressBar(0, 2, 50, '#', '=');
             CP1.show(1, "初始数据库...");
@@ -46,10 +45,6 @@ public class ExportTest {
                 stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
                         ResultSet.CONCUR_UPDATABLE);
 
-               /* Statement stmt = con.createStatement(
-                        ResultSet.TYPE_SCROLL_SENSITIVE,
-                        ResultSet.CONCUR_UPDATABLE);
-                */
                 CP1.show(2, "初始数据库完成");
 
                 ConsoleProgressBar CP2 = new ConsoleProgressBar(0, 2, 50, '#', '=');
@@ -64,7 +59,6 @@ public class ExportTest {
                 rs = stmt.executeQuery(sql);
                 rsmd = rs.getMetaData();
 
-
                 List<String> list = new ArrayList<String>();
                 List<String> list2 = new ArrayList<String>();
                 for (int i = 1; i <= rsmd.getColumnCount(); i++) {
@@ -72,17 +66,6 @@ public class ExportTest {
                     list.add(name);
                     list2.add(rsmd.getColumnTypeName(i));
                 }
-
-
-
-
-
-                //int columnCount = rsmd.getColumnCount();
-                /*for (int i = 1; i <= columnCount; i++)  {
-                    String s = rsmd.getColumnTypeName(i);
-                    System.out.println ("Column " + i + " is type " + s);
-                }*/
-
 
                 ExportExcel2007 exportExcel2007 = new ExportExcel2007();
 
@@ -223,7 +206,7 @@ public class ExportTest {
         for (Map.Entry<String, String> entry : ExportExcel2007.SQL_MAP.entrySet()) {
             sql = sql.replaceAll("@"+entry.getKey()+"@",entry.getValue());
         }
-        //file.renameTo(file1);
+        file.renameTo(file1);
         arr[1]= sql;
         return arr;
     }
@@ -302,6 +285,10 @@ public class ExportTest {
 
         String PAGE_SIZESTR = pps.getProperty("PAGE_SIZE","10000");
         ExportExcel2007.PAGE_SIZE =  Integer.valueOf(PAGE_SIZESTR);
+
+        String EXCEL_SPLIT = pps.getProperty("EXCEL_SPLIT","0");
+        ExportExcel2007.EXCEL_SPLIT =  Integer.valueOf(EXCEL_SPLIT);
+
 
 
         // 返回Properties中包含的key-value的Set视图
