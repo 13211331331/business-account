@@ -284,7 +284,7 @@ public class ExportExcel2007 {
             Row row = null;
             if(ExportExcel2007.EXCEL_SPLIT == 0){
                 sheet = ExportExcel2007.tplWorkBook.get(0).getSheet(SHEETS_OR_FILES.get(0));
-                row = sheet.createRow(index + 2);
+                row = sheet.createRow(countIndex() + 2);
             }
 
             if(ExportExcel2007.EXCEL_SPLIT == 1){
@@ -385,6 +385,10 @@ public class ExportExcel2007 {
         if(countOver == 0){
             complete = true;
         }
+    }
+
+    public static synchronized int countIndex() {
+        return countAll - countOver;
     }
 
 
