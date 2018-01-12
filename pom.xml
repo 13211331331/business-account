@@ -39,9 +39,6 @@
         <module>core</module>
         <module>spring-batch</module>
         <module>osjp-spring-batch-example</module>
-        <module>mymq</module>
-        <module>springbootdemo</module>
-        <module>bas</module>
     </modules>
 
 

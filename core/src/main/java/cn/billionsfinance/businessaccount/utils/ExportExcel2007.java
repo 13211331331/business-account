@@ -1,6 +1,7 @@
 package cn.billionsfinance.businessaccount.utils;
 
 import cn.billionsfinance.businessaccount.core.bean.BeanExcelExport;
+import com.sun.rowset.CachedRowSetImpl;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
@@ -8,12 +9,11 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.*;
 
+import javax.sql.rowset.CachedRowSet;
 import java.io.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Excel 相关操作类(大数据量写入但受Excel数据行数限制)
@@ -21,12 +21,14 @@ import java.util.concurrent.Executors;
  */
 public class ExportExcel2007 {
 
-    public static int THREAD_NUMBER = 50;
+    public static int PAGE_SIZE = 10000;
+
+    //public static int THREAD_NUMBER = 50;
 
     //总数
-    public static Long countAll = 0l;
+    public static Integer countAll = 0;
     //剩余未处理
-    public static Long countOver = 0l;
+    public static Integer countOver = 0;
 
     public static List<SXSSFWorkbook> tplWorkBook;
 
@@ -37,12 +39,12 @@ public class ExportExcel2007 {
     public static List<String> SHEETS_OR_FILES;
 
 
-    public static int QUEUE_LIST_SIZE;
+    //public static int QUEUE_LIST_SIZE;
 
     //默认列宽度
-    public static int DEFAULT_COLUMN_SIZE = 15;
+    //public static int DEFAULT_COLUMN_SIZE = 15;
 
-    public static Long SHEET_FILE_SIZE = 1000l;
+    //public static Long SHEET_FILE_SIZE = 1000l;
 
     //刷新写入硬盘数据阀值
     public static final int flushRows = 100;
@@ -51,8 +53,8 @@ public class ExportExcel2007 {
     public static int SHOW_THREAD = 1;
 
 
-    public static Long PAGE_NUMBER = 0l;
-    public static Long PAGE_CURRENT = 0L;
+    public static Integer PAGE_NUMBER = 0;
+    //public static Long PAGE_CURRENT = 0L;
 
     public static boolean complete = false;
 
@@ -66,33 +68,34 @@ public class ExportExcel2007 {
      *
      * @param columnNames 表头
      */
-    public void exportExcel(String directory, String fileName,Long count, List<String> columnNames,ResultSet rs) throws IOException {
+    public void exportExcel(String directory, String fileName,Integer count, List<String> columnNames,List<String> columnTypes,ResultSet rs) throws IOException, SQLException {
 
         this.countAll = count;
         this.countOver = count;
 
+
         List<String> sheetsOrFiles = new ArrayList<String>();
 
-        if(count > SHEET_FILE_SIZE){
-            Long temp1 = count / SHEET_FILE_SIZE;
-            Long temp2 = count % SHEET_FILE_SIZE;
+        if(count > PAGE_SIZE){
+            Integer temp1 = count / PAGE_SIZE;
+            Integer temp2 = count % PAGE_SIZE;
             PAGE_NUMBER = temp1;
             if(temp2 > 0){
                 temp1 = temp1 + 1;
                 PAGE_NUMBER = temp1;
             }
-            for(Long i = 1l; i<=temp1;i++){
+            for(Integer i = 1; i<=temp1;i++){
                 if(i == temp1){
-                    sheetsOrFiles.add(fileName + ((i-1l)*SHEET_FILE_SIZE+1) + "-" + count);
+                    sheetsOrFiles.add(fileName + ((i-1l)*PAGE_SIZE+1) + "-" + count);
                 }
                 else{
-                    sheetsOrFiles.add(fileName + ((i-1l)*SHEET_FILE_SIZE+1) + "-" + ((i)*SHEET_FILE_SIZE));
+                    sheetsOrFiles.add(fileName + ((i-1l)*PAGE_SIZE+1) + "-" + ((i)*PAGE_SIZE));
                 }
             }
         }
         else{
             sheetsOrFiles.add(fileName);
-            PAGE_NUMBER = 1l;
+            PAGE_NUMBER = 1;
         }
         SHEETS_OR_FILES = sheetsOrFiles;
         ExportExcel2007.directory = directory;
@@ -106,10 +109,10 @@ public class ExportExcel2007 {
 
         for(int i=0;i<PAGE_NUMBER;i++){
             SXSSFWorkbook book = new SXSSFWorkbook(flushRows);
-            Map<String, CellStyle> cellStyleMap = styleMap(book);
+            //Map<String, CellStyle> cellStyleMap = styleMap(book);
             // 表头样式
-            CellStyle headStyle = cellStyleMap.get("head");
-            CellStyle headTitleStyle = cellStyleMap.get("headTitle");
+            //CellStyle headStyle = cellStyleMap.get("head");
+            //CellStyle headTitleStyle = cellStyleMap.get("headTitle");
             // 生成一个表格
 
             if(ExportExcel2007.SCHEMA == 1){
@@ -118,14 +121,14 @@ public class ExportExcel2007 {
 
                     Sheet  sheet = book.createSheet(str);
                     // 设置表格默认列宽度
-                    sheet.setDefaultColumnWidth(DEFAULT_COLUMN_SIZE);
+                    //sheet.setDefaultColumnWidth(DEFAULT_COLUMN_SIZE);
                     // 合并单元格
                     sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnNames.size() - 1));
 
                     // 产生表格标题行
                     Row rowMerged = sheet.createRow(0);
                     Cell mergedCell = rowMerged.createCell(0);
-                    mergedCell.setCellStyle(headTitleStyle);
+                   // mergedCell.setCellStyle(headTitleStyle);
                     mergedCell.setCellValue(new XSSFRichTextString(str));
                     //写入成功一行数据递增行数
 
@@ -133,7 +136,7 @@ public class ExportExcel2007 {
                     Row row = sheet.createRow(1);
                     for (int j = 0; j < columnNames.size(); j++) {
                         Cell cell = row.createCell(j);
-                        cell.setCellStyle(headStyle);
+                       // cell.setCellStyle(headStyle);
                         RichTextString text = new XSSFRichTextString(columnNames.get(j));
                         cell.setCellValue(text);
                     }
@@ -145,14 +148,14 @@ public class ExportExcel2007 {
 
                 Sheet  sheet = book.createSheet(ExportExcel2007.SHEETS_OR_FILES.get(i));
                 // 设置表格默认列宽度
-                sheet.setDefaultColumnWidth(DEFAULT_COLUMN_SIZE);
+                //sheet.setDefaultColumnWidth(DEFAULT_COLUMN_SIZE);
                 // 合并单元格
                 sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnNames.size() - 1));
 
                 // 产生表格标题行
                 Row rowMerged = sheet.createRow(0);
                 Cell mergedCell = rowMerged.createCell(0);
-                mergedCell.setCellStyle(headTitleStyle);
+                //mergedCell.setCellStyle(headTitleStyle);
                 mergedCell.setCellValue(new XSSFRichTextString(ExportExcel2007.SHEETS_OR_FILES.get(i)));
                 //写入成功一行数据递增行数
 
@@ -160,7 +163,7 @@ public class ExportExcel2007 {
                 Row row = sheet.createRow(1);
                 for (int j = 0; j < columnNames.size(); j++) {
                     Cell cell = row.createCell(j);
-                    cell.setCellStyle(headStyle);
+                    //cell.setCellStyle(headStyle);
                     RichTextString text = new XSSFRichTextString(columnNames.get(j));
                     cell.setCellValue(text);
                 }
@@ -169,13 +172,13 @@ public class ExportExcel2007 {
             tplWorkBook.add(book);
         }
 
-        AsynWorker.doAsynWork(new Object[]{(ArrayList<String>) columnNames }, this, "doingExport");
+        //AsynWorker.doAsynWork(new Object[]{(ArrayList<String>) columnNames }, this, "doingExport");
         AsynWorker.doAsynWork(new Object[]{}, this, "closeFile");
         AsynWorker.doAsynWork(new Object[]{}, this, "showProcess");
         if(SHOW_THREAD == 1){
             AsynWorker.doAsynWork(new Object[]{}, new ThreadViewer(), "showThreads");
         }
-        putting(columnNames, rs);
+        putting(columnNames,columnTypes,count, rs);
     }
 
     public void showProcess(){
@@ -184,11 +187,11 @@ public class ExportExcel2007 {
         //写入成功一行数据递增行数
         while (true){
             try {
-                Long over = ExportExcel2007.countAll  - ExportExcel2007.countOver;
+                Integer over = ExportExcel2007.countAll  - ExportExcel2007.countOver;
                 if(!flag){
                     CP3.show(over,"正在导出第"+(over)+"条数据...");
                 }
-                if(over.longValue() == ExportExcel2007.countAll.longValue()){
+                if(over.intValue() == ExportExcel2007.countAll.intValue()){
                     flag = true;
                 }
                 Thread.sleep(300);
@@ -249,11 +252,29 @@ public class ExportExcel2007 {
 
 
     }
-    public void putting(List<String> columnNames, ResultSet rs) {
+    public void putting(List<String> columnNames,List<String> columnTypes, Integer count,ResultSet rs) throws SQLException {
 
-        ArrayList<BeanExcelExport> list;
-        int index = 0;
-        int index1 = 0;
+
+
+        int tmp1 = count/PAGE_SIZE;
+        int tmp2 = count%PAGE_SIZE;
+        int pages = tmp1;
+        if(tmp2 != 0){
+            pages = tmp1 + 1;
+        }
+        for(int i=1;i<=pages;i++){
+            CachedRowSet crs = new CachedRowSetImpl();
+            crs.setPageSize(PAGE_SIZE);
+            crs.populate(rs, (i-1)*PAGE_SIZE + 1);
+            puttingPage(i,crs,columnNames,columnTypes);
+        }
+
+
+
+
+        /*ArrayList<BeanExcelExport> list;
+        int index66 = 0;
+        int index166 = 0;
         try {
             list = new ArrayList<BeanExcelExport>();
             while (rs.next()) {
@@ -288,15 +309,79 @@ public class ExportExcel2007 {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }*/
+    }
+
+    public void puttingPage(Integer page,CachedRowSet crs, List<String> columnNames,List<String> columnTypes) throws SQLException {
+        crs.beforeFirst(); // 可滚动
+        int index = 0;
+        while (crs.next()) {
+
+            Sheet sheet = null;
+            Row row = null;
+            if(ExportExcel2007.SCHEMA == 1){
+                sheet = ExportExcel2007.tplWorkBook.get(0).getSheet(SHEETS_OR_FILES.get(page - 1));
+                row = sheet.createRow(index + 2);
+            }
+            if(ExportExcel2007.SCHEMA == 2){
+                sheet = ExportExcel2007.tplWorkBook.get(page-1).getSheet(SHEETS_OR_FILES.get(page-1));
+                row = sheet.createRow(index + 2);
+            }
+
+            index ++;
+
+            int index1 = 0;
+            for(String key:columnNames){
+                boolean isNumber = true;
+                Float f = null;
+                String str = "";
+                try {
+                    if(ifIsNumber(index1, columnTypes)){
+                        f = crs.getFloat(key);
+                        isNumber = true;
+                        if(f == null){
+                            f = 0f;
+                        }
+                    }else{
+                        str = crs.getString(key);
+                        isNumber = false;
+                    }
+
+
+                } catch (SQLException e) {
+                    isNumber = false;
+                    e.printStackTrace();
+                }
+
+                Cell contentCell = row.createCell(index1);
+                if(isNumber){
+                    contentCell.setCellValue(f);
+                }else {
+                    contentCell.setCellValue(str);
+                }
+
+                index1 ++;
+            }
+            ExportExcel2007.countOverNONO();
+
+
         }
+
     }
 
-    private String getSheetOrFileName(List<String> sheetsOrFiles) {
+    private boolean ifIsNumber(int index1, List<String> columnTypes) {
+        if(columnTypes.get(index1).indexOf("NUMBER") != -1){
+            return true;
+        }
+        return false;
+    }
+
+   /* private String getSheetOrFileName(List<String> sheetsOrFiles) {
         return sheetsOrFiles.get(PAGE_CURRENT.intValue());
-    }
+    }*/
 
 
-    public void doingExport(ArrayList<String> columnNames) {
+   /* public void doingExport(ArrayList<String> columnNames) {
 
         for(int i=0;i<THREAD_NUMBER;i++){
             if(this.countOver == 0){
@@ -313,7 +398,7 @@ public class ExportExcel2007 {
             }
         }
 
-    }
+    }*/
 
 
     /**
@@ -377,7 +462,7 @@ public class ExportExcel2007 {
         // 表头样式
         style.setFillPattern(XSSFCellStyle.SOLID_FOREGROUND);
         style.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
-        font.setFontHeightInPoints((short) 12);
+        font.setFontHeightInPoints((short) 10);
         font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
         // 把字体应用到当前的样式
         style.setFont(font);
@@ -390,7 +475,7 @@ public class ExportExcel2007 {
      *
      * @param workbook 工作薄
      */
-    private CellStyle createCellHeadTitleStyle(Workbook workbook) {
+    private CellStyle createCellHeadTitleStyle11(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         // 设置边框样式
         style.setBorderBottom(XSSFCellStyle.BORDER_THIN);
@@ -404,7 +489,7 @@ public class ExportExcel2007 {
         // 表头样式
         style.setFillPattern(XSSFCellStyle.SOLID_FOREGROUND);
         style.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
-        font.setFontHeightInPoints((short) 32);
+        font.setFontHeightInPoints((short) 10);
         font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
         // 把字体应用到当前的样式
         style.setFont(font);
@@ -416,7 +501,7 @@ public class ExportExcel2007 {
      *
      * @param workbook 工作薄
      */
-    private CellStyle createCellContentStyle(Workbook workbook) {
+    private CellStyle createCellContentStyle11(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         // 设置边框样式
         style.setBorderBottom(XSSFCellStyle.BORDER_THIN);
@@ -439,7 +524,7 @@ public class ExportExcel2007 {
     /**
      * 单元格样式(Integer)列表
      */
-    private CellStyle createCellContent4IntegerStyle(Workbook workbook) {
+    private CellStyle createCellContent4IntegerStyle11(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         // 设置边框样式
         style.setBorderBottom(XSSFCellStyle.BORDER_THIN);
@@ -463,7 +548,7 @@ public class ExportExcel2007 {
     /**
      * 单元格样式(Double)列表
      */
-    private CellStyle createCellContent4DoubleStyle(Workbook workbook) {
+    private CellStyle createCellContent4DoubleStyle11(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         // 设置边框样式
         style.setBorderBottom(XSSFCellStyle.BORDER_THIN);
@@ -487,13 +572,13 @@ public class ExportExcel2007 {
     /**
      * 单元格样式列表
      */
-    private Map<String, CellStyle> styleMap(Workbook workbook) {
+    private Map<String, CellStyle> styleMap11(Workbook workbook) {
         Map<String, CellStyle> styleMap = new LinkedHashMap<String, CellStyle>();
         styleMap.put("head", createCellHeadStyle(workbook));
-        styleMap.put("headTitle", createCellHeadTitleStyle(workbook));
-        styleMap.put("content", createCellContentStyle(workbook));
-        styleMap.put("integer", createCellContent4IntegerStyle(workbook));
-        styleMap.put("double", createCellContent4DoubleStyle(workbook));
+       // styleMap.put("headTitle", createCellHeadTitleStyle(workbook));
+        //styleMap.put("content", createCellContentStyle(workbook));
+       // styleMap.put("integer", createCellContent4IntegerStyle(workbook));
+        //styleMap.put("double", createCellContent4DoubleStyle(workbook));
         return styleMap;
     }
 
@@ -503,17 +588,7 @@ public class ExportExcel2007 {
             complete = true;
         }
     }
-    public static synchronized void pageYESYES() {
-        PAGE_CURRENT = PAGE_CURRENT + 1l;
-    }
 
-    public static int getFileIndex(String sheetOrFile) {
-        for(int i = 0;i< SHEETS_OR_FILES.size();i++){
-            String s = SHEETS_OR_FILES.get(i);
-            if(s.equals(sheetOrFile)){
-                return i;
-            }
-        }
-        return 0;
-    }
+
+
 }

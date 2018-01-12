@@ -25,7 +25,7 @@ public class ExcelConsumer implements Runnable {
     }
 
     public void run() {
-        while(!(ExportExcel2007.countOver == 0)){
+        /*while(!(ExportExcel2007.countOver == 0)){
             ArrayList<BeanExcelExport> list = null;
             try {
                 list = ExeclBasket.consume();
@@ -66,7 +66,7 @@ public class ExcelConsumer implements Runnable {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
 
 
 

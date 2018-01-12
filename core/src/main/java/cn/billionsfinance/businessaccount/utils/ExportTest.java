@@ -2,17 +2,16 @@ package cn.billionsfinance.businessaccount.utils;
 
 
 import java.io.*;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.*;
+import java.util.Date;
 
 /**
  * Created by hanlin.huang on 2017/4/10.
  */
-public class ExportMain {
+public class ExportTest {
+
+
 
     public static void main(String[] args) {
         Date start = new Date();
@@ -44,7 +43,13 @@ public class ExportMain {
             ResultSetMetaData rsmd = null;
             try {
                 conn = JdbcUtil.getConnection();
-                stmt = conn.createStatement();
+                stmt = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
+
+               /* Statement stmt = con.createStatement(
+                        ResultSet.TYPE_SCROLL_SENSITIVE,
+                        ResultSet.CONCUR_UPDATABLE);
+                */
                 CP1.show(2, "初始数据库完成");
 
                 ConsoleProgressBar CP2 = new ConsoleProgressBar(0, 2, 50, '#', '=');
@@ -68,11 +73,20 @@ public class ExportMain {
                     list2.add(rsmd.getColumnTypeName(i));
                 }
 
+
+
+
+
+                //int columnCount = rsmd.getColumnCount();
+                /*for (int i = 1; i <= columnCount; i++)  {
+                    String s = rsmd.getColumnTypeName(i);
+                    System.out.println ("Column " + i + " is type " + s);
+                }*/
+
+
                 ExportExcel2007 exportExcel2007 = new ExportExcel2007();
 
-
-
-                String path = ExportMain.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+                String path = ExportTest.class.getProtectionDomain().getCodeSource().getLocation().getPath();
                 if (path.substring(0, 1).endsWith("/")) {
                     path = path.substring(1, path.length());
                 }
@@ -84,7 +98,6 @@ public class ExportMain {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
 
 
                 while (true){
@@ -122,7 +135,7 @@ public class ExportMain {
 
     private static String[] getSqlAndRename() {
         String[] arr = new String[2];
-        String path = ExportMain.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        String path = ExportTest.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         if (path.substring(0, 1).endsWith("/")) {
             path = path.substring(1, path.length());
         }
@@ -210,7 +223,7 @@ public class ExportMain {
         for (Map.Entry<String, String> entry : ExportExcel2007.SQL_MAP.entrySet()) {
             sql = sql.replaceAll("@"+entry.getKey()+"@",entry.getValue());
         }
-        file.renameTo(file1);
+        //file.renameTo(file1);
         arr[1]= sql;
         return arr;
     }
@@ -220,7 +233,7 @@ public class ExportMain {
     private static boolean initConfig() throws Exception {
 
         Boolean result = true;
-        String path = ExportMain.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        String path = ExportTest.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         if (path.substring(0, 1).endsWith("/")) {
             path = path.substring(1, path.length());
         }
@@ -267,24 +280,28 @@ public class ExportMain {
         JdbcUtil.setUser(jdbc_username);
         JdbcUtil.setPassword(jdbc_password);
 
-       // String DEFAULT_COLUMN_SIZE = pps.getProperty("DEFAULT_COLUMN_SIZE","15");
+        //String DEFAULT_COLUMN_SIZE = pps.getProperty("DEFAULT_COLUMN_SIZE","15");
         //ExportExcel2007.DEFAULT_COLUMN_SIZE = Integer.valueOf(DEFAULT_COLUMN_SIZE);
 
         //String SHEET_FILE_SIZE = pps.getProperty("SHEET_FILE_SIZE","1000");
-        //ExportExcel2007.SHEET_FILE_SIZE = Long.valueOf(SHEET_FILE_SIZE);
+       // ExportExcel2007.SHEET_FILE_SIZE = Long.valueOf(SHEET_FILE_SIZE);
 
         String SCHEMA = pps.getProperty("SCHEMA","1");
         ExportExcel2007.SCHEMA = Integer.valueOf(SCHEMA);
 
-       // String THREAD_NUMBER = pps.getProperty("THREAD_NUMBER","50");
+        //String THREAD_NUMBER = pps.getProperty("THREAD_NUMBER","50");
         //ExportExcel2007.THREAD_NUMBER = Integer.valueOf(THREAD_NUMBER);
 
 
         //String QUEUE_LIST_SIZE = pps.getProperty("QUEUE_LIST_SIZE","5000");
-       // ExportExcel2007.QUEUE_LIST_SIZE = Integer.valueOf(QUEUE_LIST_SIZE);
+        //ExportExcel2007.QUEUE_LIST_SIZE = Integer.valueOf(QUEUE_LIST_SIZE);
 
         String SHOW_THREAD = pps.getProperty("SHOW_THREAD","1");
         ExportExcel2007.SHOW_THREAD = Integer.valueOf(SHOW_THREAD);
+
+
+        String PAGE_SIZESTR = pps.getProperty("PAGE_SIZE","10000");
+        ExportExcel2007.PAGE_SIZE =  Integer.valueOf(PAGE_SIZESTR);
 
 
         // 返回Properties中包含的key-value的Set视图
