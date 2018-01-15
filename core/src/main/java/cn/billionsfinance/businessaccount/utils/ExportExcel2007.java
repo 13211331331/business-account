@@ -173,7 +173,7 @@ public class ExportExcel2007 {
                         CP3.show(over, "正在装载Excel的sheet、表头...");
                     }
                     if(ExportMain.STEP == 4){
-                       if(ExportMain.SUB_STEP == 0){
+                       if(ExportMain.SUB_STEP == 0 || ExportMain.SUB_STEP == 1){
                            CP3.show(over, "装载第"+ExportMain.SUB_STEP+"离线页(总"+ExportExcel2007.PAGE_NUMBER+"离线页)");
                        }else{
                            CP3.show(over, "装载第"+ExportMain.SUB_STEP+"离线页(总"+ExportExcel2007.PAGE_NUMBER+"离线页),正在导出第"+(over)+"条数据...");
