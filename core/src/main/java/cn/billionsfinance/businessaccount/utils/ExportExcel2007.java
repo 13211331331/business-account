@@ -2,9 +2,7 @@ package cn.billionsfinance.businessaccount.utils;
 
 import com.sun.rowset.CachedRowSetImpl;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.apache.poi.xssf.usermodel.*;
 
 import javax.sql.rowset.CachedRowSet;
 import java.io.*;
@@ -112,20 +110,9 @@ public class ExportExcel2007 {
                     for(String str:sheetsOrFiles){
 
                         Sheet  sheet = book.createSheet(str);
-                       /* // 合并单元格
-                        sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnNames.size() - 1));
-
-                        // 产生表格标题行
-                        Row rowMerged = sheet.createRow(0);
-                        Cell mergedCell = rowMerged.createCell(0);
-                        mergedCell.setCellValue(new XSSFRichTextString(str));*/
-                        //写入成功一行数据递增行数
-
-                        // 产生表格表头列标题行
                         Row row = sheet.createRow(0);
                         for (int j = 0; j < columnNames.size(); j++) {
                             Cell cell = row.createCell(j);
-                           // RichTextString text = new XSSFRichTextString(columnNames.get(j));
                             cell.setCellValue(columnNames.get(j));
                         }
                         //sheet.createFreezePane( 0, 2, 0, 2 );
@@ -135,21 +122,10 @@ public class ExportExcel2007 {
                 if(ExportExcel2007.SCHEMA == 2){
 
                     Sheet  sheet = book.createSheet(ExportExcel2007.SHEETS_OR_FILES.get(i));
-                   /* // 合并单元格
-                    sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnNames.size() - 1));
-
-                    // 产生表格标题行
-                    Row rowMerged = sheet.createRow(0);
-                    Cell mergedCell = rowMerged.createCell(0);
-                    mergedCell.setCellValue(new XSSFRichTextString(ExportExcel2007.SHEETS_OR_FILES.get(i)));
-                    //写入成功一行数据递增行数*/
-
                     // 产生表格表头列标题行
                     Row row = sheet.createRow(0);
                     for (int j = 0; j < columnNames.size(); j++) {
                         Cell cell = row.createCell(j);
-                        //cell.setCellStyle(headStyle);
-                        //RichTextString text = new XSSFRichTextString(columnNames.get(j));
                         cell.setCellValue(columnNames.get(j));
                     }
                     //sheet.createFreezePane( 0, 2, 0, 2 );
@@ -160,22 +136,10 @@ public class ExportExcel2007 {
         if(ExportExcel2007.EXCEL_SPLIT == 0){
             SXSSFWorkbook book = new SXSSFWorkbook(flushRows);
             Sheet  sheet = book.createSheet(ExportExcel2007.SHEETS_OR_FILES.get(0));
-           /*
-            // 合并单元格
-            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnNames.size() - 1));
-
-            // 产生表格标题行
-            Row rowMerged = sheet.createRow(0);
-            Cell mergedCell = rowMerged.createCell(0);
-            mergedCell.setCellValue(new XSSFRichTextString(ExportExcel2007.SHEETS_OR_FILES.get(0)));
-            //写入成功一行数据递增行数*/
-
             // 产生表格表头列标题行
             Row row = sheet.createRow(0);
             for (int j = 0; j < columnNames.size(); j++) {
                 Cell cell = row.createCell(j);
-                //cell.setCellStyle(headStyle);
-                //RichTextString text = new XSSFRichTextString(columnNames.get(j));
                 cell.setCellValue(columnNames.get(j));
             }
            // sheet.createFreezePane( 0, 2, 0, 2 );
