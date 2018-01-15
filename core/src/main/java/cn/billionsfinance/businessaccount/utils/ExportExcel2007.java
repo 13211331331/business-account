@@ -60,9 +60,7 @@ public class ExportExcel2007 {
         this.countAll = count;
         this.countOver = count;
 
-
         List<String> sheetsOrFiles = new ArrayList<String>();
-
         if(count > PAGE_SIZE){
             Integer temp1 = count / PAGE_SIZE;
             Integer temp2 = count % PAGE_SIZE;
@@ -114,47 +112,47 @@ public class ExportExcel2007 {
                     for(String str:sheetsOrFiles){
 
                         Sheet  sheet = book.createSheet(str);
-                        // 合并单元格
+                       /* // 合并单元格
                         sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnNames.size() - 1));
 
                         // 产生表格标题行
                         Row rowMerged = sheet.createRow(0);
                         Cell mergedCell = rowMerged.createCell(0);
-                        mergedCell.setCellValue(new XSSFRichTextString(str));
+                        mergedCell.setCellValue(new XSSFRichTextString(str));*/
                         //写入成功一行数据递增行数
 
                         // 产生表格表头列标题行
-                        Row row = sheet.createRow(1);
+                        Row row = sheet.createRow(0);
                         for (int j = 0; j < columnNames.size(); j++) {
                             Cell cell = row.createCell(j);
-                            RichTextString text = new XSSFRichTextString(columnNames.get(j));
-                            cell.setCellValue(text);
+                           // RichTextString text = new XSSFRichTextString(columnNames.get(j));
+                            cell.setCellValue(columnNames.get(j));
                         }
-                        sheet.createFreezePane( 0, 2, 0, 2 );
+                        //sheet.createFreezePane( 0, 2, 0, 2 );
                     }
                 }
 
                 if(ExportExcel2007.SCHEMA == 2){
 
                     Sheet  sheet = book.createSheet(ExportExcel2007.SHEETS_OR_FILES.get(i));
-                    // 合并单元格
+                   /* // 合并单元格
                     sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnNames.size() - 1));
 
                     // 产生表格标题行
                     Row rowMerged = sheet.createRow(0);
                     Cell mergedCell = rowMerged.createCell(0);
                     mergedCell.setCellValue(new XSSFRichTextString(ExportExcel2007.SHEETS_OR_FILES.get(i)));
-                    //写入成功一行数据递增行数
+                    //写入成功一行数据递增行数*/
 
                     // 产生表格表头列标题行
-                    Row row = sheet.createRow(1);
+                    Row row = sheet.createRow(0);
                     for (int j = 0; j < columnNames.size(); j++) {
                         Cell cell = row.createCell(j);
                         //cell.setCellStyle(headStyle);
-                        RichTextString text = new XSSFRichTextString(columnNames.get(j));
-                        cell.setCellValue(text);
+                        //RichTextString text = new XSSFRichTextString(columnNames.get(j));
+                        cell.setCellValue(columnNames.get(j));
                     }
-                    sheet.createFreezePane( 0, 2, 0, 2 );
+                    //sheet.createFreezePane( 0, 2, 0, 2 );
                 }
                 tplWorkBook.add(book);
             }
@@ -162,6 +160,7 @@ public class ExportExcel2007 {
         if(ExportExcel2007.EXCEL_SPLIT == 0){
             SXSSFWorkbook book = new SXSSFWorkbook(flushRows);
             Sheet  sheet = book.createSheet(ExportExcel2007.SHEETS_OR_FILES.get(0));
+           /*
             // 合并单元格
             sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, columnNames.size() - 1));
 
@@ -169,20 +168,19 @@ public class ExportExcel2007 {
             Row rowMerged = sheet.createRow(0);
             Cell mergedCell = rowMerged.createCell(0);
             mergedCell.setCellValue(new XSSFRichTextString(ExportExcel2007.SHEETS_OR_FILES.get(0)));
-            //写入成功一行数据递增行数
+            //写入成功一行数据递增行数*/
 
             // 产生表格表头列标题行
-            Row row = sheet.createRow(1);
+            Row row = sheet.createRow(0);
             for (int j = 0; j < columnNames.size(); j++) {
                 Cell cell = row.createCell(j);
                 //cell.setCellStyle(headStyle);
-                RichTextString text = new XSSFRichTextString(columnNames.get(j));
-                cell.setCellValue(text);
+                //RichTextString text = new XSSFRichTextString(columnNames.get(j));
+                cell.setCellValue(columnNames.get(j));
             }
-            sheet.createFreezePane( 0, 2, 0, 2 );
+           // sheet.createFreezePane( 0, 2, 0, 2 );
             tplWorkBook.add(book);
         }
-
 
         AsynWorker.doAsynWork(new Object[]{}, this, "closeFile");
         AsynWorker.doAsynWork(new Object[]{}, this, "showProcess");
@@ -218,23 +216,19 @@ public class ExportExcel2007 {
                 try {
                     List<OutputStream> ops = new ArrayList<OutputStream>();
                     try {
-
                         for(String str:ExportExcel2007.excelFileName){
                             OutputStream os = new FileOutputStream(assertFile(directory, str));
                             ops.add(os);
                         }
-
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
-
                     for(int i=0;i<ops.size();i++){
                         OutputStream outputStream = ops.get(i);
                         tplWorkBook.get(i).write(outputStream);
                         outputStream.flush();
                         outputStream.close();
                     }
-
                     completeAll = true;
                     try {
                         Thread.sleep(2000);
@@ -249,7 +243,6 @@ public class ExportExcel2007 {
                         e1.printStackTrace();
                     }
                 }
-
             }
             try {
                 Thread.sleep(1000);
@@ -279,46 +272,39 @@ public class ExportExcel2007 {
         crs.beforeFirst(); // 可滚动
         int index = 0;
         while (crs.next()) {
-
             Sheet sheet = null;
             Row row = null;
             if(ExportExcel2007.EXCEL_SPLIT == 0){
                 sheet = ExportExcel2007.tplWorkBook.get(0).getSheet(SHEETS_OR_FILES.get(0));
-                row = sheet.createRow(countIndex() + 2);
+                row = sheet.createRow(countIndex() + 1);
             }
-
             if(ExportExcel2007.EXCEL_SPLIT == 1){
                 if(ExportExcel2007.SCHEMA == 1){
                     sheet = ExportExcel2007.tplWorkBook.get(0).getSheet(SHEETS_OR_FILES.get(page - 1));
-                    row = sheet.createRow(index + 2);
+                    row = sheet.createRow(index + 1);
                 }
                 if(ExportExcel2007.SCHEMA == 2){
                     sheet = ExportExcel2007.tplWorkBook.get(page-1).getSheet(SHEETS_OR_FILES.get(page-1));
-                    row = sheet.createRow(index + 2);
+                    row = sheet.createRow(index + 1);
                 }
             }
-
-
             index ++;
-
             int index1 = 0;
             for(String key:columnNames){
                 boolean isNumber = true;
-                Float f = null;
+                Double aDouble = null;
                 String str = "";
                 try {
                     if(ifIsNumber(index1, columnTypes)){
-                        f = crs.getFloat(key);
+                        aDouble = crs.getDouble(key);
                         isNumber = true;
-                        if(f == null){
-                            f = 0f;
+                        if(aDouble == null){
+                            aDouble = 0d;
                         }
                     }else{
                         str = crs.getString(key);
                         isNumber = false;
                     }
-
-
                 } catch (SQLException e) {
                     isNumber = false;
                     e.printStackTrace();
@@ -326,16 +312,13 @@ public class ExportExcel2007 {
 
                 Cell contentCell = row.createCell(index1);
                 if(isNumber){
-                    contentCell.setCellValue(f);
+                    contentCell.setCellValue(aDouble);
                 }else {
                     contentCell.setCellValue(str);
                 }
-
                 index1 ++;
             }
             ExportExcel2007.countOverNONO();
-
-
         }
 
     }
