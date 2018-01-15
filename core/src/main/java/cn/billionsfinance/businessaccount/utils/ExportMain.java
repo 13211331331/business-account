@@ -13,6 +13,9 @@ import java.util.Date;
  */
 public class ExportMain {
 
+    public static Integer STEP = 0;
+    public static Integer SUB_STEP = 0;
+
     public static void main(String[] args) throws IOException {
         Date start = new Date();
         boolean isNext = true;
@@ -47,7 +50,9 @@ public class ExportMain {
                 }
                 CP2.show(2, "读取文件："+sqls[0]+"  总记录数：" + count);
                 JdbcUtil.close(rs);
+                STEP = 1;
                 rs = stmt.executeQuery(sql);
+                STEP = 2;
                 rsmd = rs.getMetaData();
                 List<String> list = new ArrayList<String>();
                 List<String> list2 = new ArrayList<String>();

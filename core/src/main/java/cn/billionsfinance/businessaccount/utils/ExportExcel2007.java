@@ -58,6 +58,7 @@ public class ExportExcel2007 {
         this.countAll = count;
         this.countOver = count;
 
+        ExportMain.STEP = 3;
         List<String> sheetsOrFiles = new ArrayList<String>();
         if(count > PAGE_SIZE){
             Integer temp1 = count / PAGE_SIZE;
@@ -162,7 +163,23 @@ public class ExportExcel2007 {
             try {
                 Integer over = ExportExcel2007.countAll  - ExportExcel2007.countOver;
                 if(!flag){
-                    CP3.show(over,"正在导出第"+(over)+"条数据...");
+                    if(ExportMain.STEP == 1){
+                        CP3.show(over, "正在调用脚本查询数据...");
+                    }
+                    if(ExportMain.STEP == 2){
+                        CP3.show(over, "正在获取MetaData...");
+                    }
+                    if(ExportMain.STEP == 3){
+                        CP3.show(over, "正在装载Excel的sheet、表头...");
+                    }
+                    if(ExportMain.STEP == 4){
+                       if(ExportMain.SUB_STEP == 0){
+                           CP3.show(over, "装载第"+ExportMain.SUB_STEP+"离线页(总"+ExportExcel2007.PAGE_NUMBER+"离线页)");
+                       }else{
+                           CP3.show(over, "装载第"+ExportMain.SUB_STEP+"离线页(总"+ExportExcel2007.PAGE_NUMBER+"离线页),正在导出第"+(over)+"条数据...");
+                       }
+                    }
+
                 }
                 if(over.intValue() == ExportExcel2007.countAll.intValue()){
                     flag = true;
@@ -217,6 +234,7 @@ public class ExportExcel2007 {
     }
     public void putting(List<String> columnNames,List<String> columnTypes, Integer count,ResultSet rs) throws SQLException {
 
+        ExportMain.STEP = 4;
         int tmp1 = count/PAGE_SIZE;
         int tmp2 = count%PAGE_SIZE;
         int pages = tmp1;
@@ -226,6 +244,7 @@ public class ExportExcel2007 {
         for(int i=1;i<=pages;i++){
             CachedRowSet crs = new CachedRowSetImpl();
             crs.setPageSize(PAGE_SIZE);
+            ExportMain.SUB_STEP = i;
             crs.populate(rs, (i-1)*PAGE_SIZE + 1);
             puttingPage(i,crs,columnNames,columnTypes);
         }
