@@ -171,13 +171,13 @@ public class ExportMain {
             }
         }
         String configFile = path + "config.properties";
-        String sqlConfigFile = path + "sql-config.properties";
+       // String sqlConfigFile11 = path + "sql-config.properties";
         Properties pps = new Properties();
-        Properties sqlPps = new Properties();
+        //Properties sqlPps = new Properties();
         InputStream in = new BufferedInputStream(new FileInputStream(configFile));
-        InputStream sqlIn = new BufferedInputStream(new FileInputStream(sqlConfigFile));
+       // InputStream sqlIn = new BufferedInputStream(new FileInputStream(sqlConfigFile));
         pps.load(in);
-        sqlPps.load(sqlIn);
+       // sqlPps.load(sqlIn);
         String jdbc_driver = pps.getProperty("jdbc.driver");
         String jdbc_url = pps.getProperty("jdbc.url");
         String jdbc_username = pps.getProperty("jdbc.username");
@@ -200,12 +200,12 @@ public class ExportMain {
         ExportExcel2007.EXCEL_SPLIT =  Integer.valueOf(EXCEL_SPLIT);
 
         // 返回Properties中包含的key-value的Set视图
-        Set<Map.Entry<Object, Object>> set = sqlPps.entrySet();
+       // Set<Map.Entry<Object, Object>> set = sqlPps.entrySet();
         // 返回在此Set中的元素上进行迭代的迭代器
-        Iterator<Map.Entry<Object, Object>> it = set.iterator();
-        String key = null, value = null;
+        //Iterator<Map.Entry<Object, Object>> it = set.iterator();
+       // String key = null, value = null;
         // 循环取出key-value
-        while (it.hasNext()) {
+       /* while (it.hasNext()) {
             Map.Entry<Object, Object> entry = it.next();
             key = String.valueOf(entry.getKey());
             value = String.valueOf(entry.getValue());
@@ -215,7 +215,7 @@ public class ExportMain {
             //System.out.println(key);
             //System.out.println(value);
             ExportExcel2007.SQL_MAP.put(key,value);
-        }
+        }*/
         return result;
     }
 
