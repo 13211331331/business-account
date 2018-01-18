@@ -131,8 +131,14 @@ public class ExportMain {
         File file = new File(path + sqlFile);
         File file1 = new File(path + sqlFile+".over");
         String sql = FileUtils.readFileToString(file, "GBK");
+        System.out.println("--------------------------------------------------------------------------------------------------------");
+        System.out.println(sql);
+        System.out.println("--------------------------------------------------------------------------------------------------------");
         if(StringUtil.isMessyCode(sql)){
             sql = FileUtils.readFileToString(file, "UTF-8");
+            System.out.println("--------------------------------------------------------------------------------------------------------");
+            System.out.println(sql);
+            System.out.println("--------------------------------------------------------------------------------------------------------");
         }
         sql =  sql.replaceAll("\\$","");
         sql =  sql.replaceAll("\\{","@");
