@@ -49,6 +49,9 @@ public class ExportMain {
                     count = rs.getInt("SUM");
                 }
                 CP2.show(2, "读取文件："+sqls[0]+"  总记录数：" + count);
+                if(count == 0){
+                    System.exit(0);
+                }
                 JdbcUtil.close(rs);
                 STEP = 1;
                 rs = stmt.executeQuery(sql);
