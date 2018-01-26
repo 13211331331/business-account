@@ -1,5 +1,6 @@
 package cn.billionsfinance.businessaccount.utils;
 
+import com.github.pagehelper.parser.CountSqlParser;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import org.apache.commons.io.output.StringBuilderWriter;
@@ -14,6 +15,10 @@ import java.util.Map;
  */
 public class FreeMarkerTest {
     public static void main(String[] args) throws IOException, TemplateException {
+
+       // net.sf.jsqlparser.expression.Expression e;
+        CountSqlParser countSqlParser = new CountSqlParser();
+        System.out.println(countSqlParser.getSmartCountSql("select aa,bb from ttt,tt where 1=1  and 2=2 "));
 
         // 创建插值的map
         Map<String,Object> map = new HashMap<String,Object>();
