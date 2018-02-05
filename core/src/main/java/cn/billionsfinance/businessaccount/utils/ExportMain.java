@@ -33,7 +33,7 @@ public class ExportMain {
         if(isNext){
             String[] sqls = getSqlAndRename();
             String sql = sqls[1];
-            String countSql = "SELECT COUNT(1) SUM FROM (" + sql + ")";
+            String countSql = "SELECT COUNT(1) SUM FROM (" + sql + ") countsql";
             ConsoleProgressBar CP1 = new ConsoleProgressBar(0, 2, 50, '#', '=');
             CP1.show(1, "初始数据库...");
             Connection conn = null;
